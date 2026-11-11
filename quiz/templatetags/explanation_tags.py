@@ -1,3 +1,8 @@
+"""
+explanation_tags.py – Custom Django template filter for structured explanation rendering.
+Parses cleaned explanation text into typed HTML blocks.
+"""
+
 import re
 from django import template
 from django.utils.safestring import mark_safe
@@ -6,265 +11,182 @@ from django.utils.html import escape
 register = template.Library()
 
 
-def _parse_blocks(text):
-    """Parse raw explanation text into typed blocks for structured rendering."""
-    # Normalize line endings and bullet characters from PDF extraction
+# ─── Bullet normalization ─────────────────────────────────────────────────────
+_BULLET_RE = re.compile(r'^\s*[•●\*\-]\s*')
+_NUM_RE     = re.compile(r'^\s*(\d+)\.\s+(.+)', re.DOTALL)
+_OPT_RE     = re.compile(r'^\s*[Oo]ption\s*\(([a-dA-D])\)\s*[:\-]?\s*(.*)', re.DOTALL)
+_NEWS_RE    = re.compile(r'^\s*In\s+NEWS\s*[:\-]?\s*(.*)', re.IGNORECASE | re.DOTALL)
+_HEAD_RE    = re.compile(r'^[A-Z][A-Za-z\s\/\-]+:?\s*$')
+
+
+def _verdict(text):
+    low = text.lower()
+    if re.search(r'is\s+correct', low):
+        return 'correct'
+    if re.search(r'is\s+(in)?correct|is\s+not\s+correct', low):
+        return 'wrong'
+    return None
+
+
+def _verdict_badge(v):
+    if v == 'correct':
+        return '<span class="exp-badge exp-correct"><svg class="exp-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Correct</span>'
+    if v == 'wrong':
+        return '<span class="exp-badge exp-wrong"><svg class="exp-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>Incorrect</span>'
+    return ''
+
+
+def _parse(text):
+    """Split text into logical blocks."""
     text = text.replace('\r\n', '\n').replace('\r', '\n')
-    # PDF often extracts '?' or '\x07' as bullet markers — normalize
-    text = text.replace('\x07', '•').replace('?', '•')
+    # Normalize exotic bullet chars
+    text = text.replace('\x07', '•').replace('●', '•').replace('*', '•')
 
-    lines = text.split('\n')
-    blocks = []  # list of dicts: {type, content, items}
+    paragraphs = re.split(r'\n\s*\n', text.strip())
+    blocks = []
 
-    i = 0
-    while i < len(lines):
-        line = lines[i].rstrip()
-
-        # Skip truly blank lines between blocks
-        if not line.strip():
-            i += 1
+    for para in paragraphs:
+        para = para.strip()
+        if not para:
             continue
 
-        stripped = line.strip()
+        lines = [l.strip() for l in para.split('\n') if l.strip()]
+        if not lines:
+            continue
+        joined = ' '.join(lines)
 
-        # === IN NEWS line ===
-        if stripped.upper().startswith('IN NEWS:'):
-            news_text = stripped[8:].strip()
-            # Collect continuation lines
-            j = i + 1
-            while j < len(lines) and lines[j].strip() and not _is_new_block(lines[j].strip()):
-                news_text += ' ' + lines[j].strip()
-                j += 1
-            blocks.append({'type': 'news', 'content': news_text})
-            i = j
+        # ── IN NEWS ──
+        m = _NEWS_RE.match(joined)
+        if m:
+            blocks.append({'type': 'news', 'text': m.group(1).strip()})
             continue
 
-        # === Numbered statement heading: "1. Title text" ===
-        m = re.match(r'^(\d+)\.\s+(.+)$', stripped)
+        # ── Numbered statement  "1. Heading text..." ──
+        m = _NUM_RE.match(joined)
         if m:
             num = m.group(1)
-            heading = m.group(2)
-            # Collect body lines until next numbered statement or new block
-            body_lines = []
-            j = i + 1
-            while j < len(lines):
-                nxt = lines[j].rstrip()
-                nxt_s = nxt.strip()
-                if not nxt_s:
-                    j += 1
-                    continue
-                if re.match(r'^\d+\.\s+', nxt_s) or _is_new_block(nxt_s):
-                    break
-                body_lines.append(nxt_s)
-                j += 1
-            blocks.append({'type': 'statement', 'num': num, 'heading': heading, 'body': body_lines})
-            i = j
+            rest = m.group(2).strip()
+            # verdict detection
+            v = _verdict(rest)
+            # find sub-bullets inside rest
+            sub_bullets = []
+            rest_clean = rest
+            if '•' in rest:
+                parts = rest.split('•')
+                rest_clean = parts[0].strip()
+                sub_bullets = [p.strip() for p in parts[1:] if p.strip()]
+            blocks.append({
+                'type': 'statement',
+                'num': num,
+                'text': rest_clean,
+                'verdict': v,
+                'bullets': sub_bullets,
+            })
             continue
 
-        # === Option analysis: "Option (a):", "Option(a):" ===
-        m = re.match(r'^[Oo]ption\s*\(([a-dA-D])\)\s*[:\-]?\s*(.*)', stripped)
+        # ── Option (a)/(b)/(c)/(d) ──
+        m = _OPT_RE.match(joined)
         if m:
-            opt_key = m.group(1).upper()
-            opt_text = m.group(2).strip()
-            j = i + 1
-            while j < len(lines):
-                nxt_s = lines[j].strip()
-                if not nxt_s:
-                    j += 1
-                    continue
-                if re.match(r'^[Oo]ption\s*\(', nxt_s) or _is_new_block(nxt_s):
-                    break
-                opt_text += ' ' + nxt_s
-                j += 1
-            blocks.append({'type': 'option', 'key': opt_key, 'content': opt_text})
-            i = j
+            key = m.group(1).upper()
+            body = m.group(2).strip()
+            v = _verdict(body)
+            blocks.append({'type': 'option', 'key': key, 'text': body, 'verdict': v})
             continue
 
-        # === Bullet list block ===
-        if stripped.startswith('•') or stripped.startswith('\t•') or stripped.startswith('\t'):
-            items = []
-            j = i
-            while j < len(lines):
-                nxt_s = lines[j].strip()
-                if not nxt_s:
-                    j += 1
-                    break  # end of bullet block
-                if nxt_s.startswith('•'):
-                    items.append(('bullet', nxt_s.lstrip('•').strip()))
-                elif re.match(r'^\d+\.\s+', nxt_s) or _is_new_block(nxt_s):
-                    break
-                else:
-                    # sub-continuation of previous item
-                    if items:
-                        items[-1] = (items[-1][0], items[-1][1] + ' ' + nxt_s)
-                    else:
-                        items.append(('text', nxt_s))
-                j += 1
+        # ── Pure bullet list block ──
+        if all(_BULLET_RE.match(l) for l in lines) and len(lines) > 1:
+            items = [_BULLET_RE.sub('', l) for l in lines]
+            blocks.append({'type': 'bullets', 'items': items})
+            continue
+
+        # ── Single-line section heading ──
+        if len(lines) == 1 and len(joined) < 70 and _HEAD_RE.match(joined):
+            blocks.append({'type': 'heading', 'text': joined})
+            continue
+
+        # ── Default paragraph — split out inline bullets if any ──
+        if '•' in joined:
+            parts = joined.split('•')
+            intro = parts[0].strip()
+            items = [p.strip() for p in parts[1:] if p.strip()]
+            if intro:
+                blocks.append({'type': 'para', 'text': intro})
             if items:
                 blocks.append({'type': 'bullets', 'items': items})
-            i = j
-            continue
-
-        # === Section heading (all-caps or Title Case short line ending without period) ===
-        if _is_section_heading(stripped):
-            blocks.append({'type': 'heading', 'content': stripped})
-            i += 1
-            continue
-
-        # === Key-value table row (e.g., "Meaning Rock engravings or carvings") ===
-        # Detect these only when several consecutive lines look like key-value pairs
-        # Try to collect a table block
-        table_rows = []
-        j = i
-        while j < len(lines):
-            nxt_s = lines[j].strip()
-            if not nxt_s:
-                break
-            kv = _as_key_value(nxt_s)
-            if kv:
-                table_rows.append(kv)
-            elif re.match(r'^\d+\.\s+', nxt_s) or _is_new_block(nxt_s):
-                break
-            else:
-                # not KV — stop collecting table
-                break
-            j += 1
-        if len(table_rows) >= 2:
-            blocks.append({'type': 'table', 'rows': table_rows})
-            i = j
-            continue
-
-        # === Default: paragraph ===
-        para = stripped
-        j = i + 1
-        while j < len(lines):
-            nxt_s = lines[j].strip()
-            if not nxt_s:
-                break
-            if _is_new_block(nxt_s) or re.match(r'^\d+\.\s+', nxt_s):
-                break
-            para += ' ' + nxt_s
-            j += 1
-        blocks.append({'type': 'para', 'content': para})
-        i = j
+        else:
+            blocks.append({'type': 'para', 'text': joined})
 
     return blocks
 
 
-def _is_new_block(s):
-    return (s.upper().startswith('IN NEWS') or
-            bool(re.match(r'^[Oo]ption\s*\(', s)) or
-            _is_section_heading(s))
-
-
-def _is_section_heading(s):
-    """Heuristic: short line, Title Case or ALL CAPS, no sentence-ending period in middle."""
-    if len(s) > 80:
-        return False
-    if s.endswith(':'):
-        return True
-    words = s.split()
-    if len(words) <= 7 and all(w[0].isupper() or not w[0].isalpha() for w in words if w):
-        # Make sure it's not an option or numbered line
-        if not re.match(r'^\d+\.', s) and '(' not in s[:3]:
-            return True
-    return False
-
-
-def _as_key_value(s):
-    """Try to split a line into a key-value pair at a capital word boundary."""
-    # e.g., "Meaning Rock engravings or carvings" — first 1-3 title-case words are key
-    m = re.match(r'^([A-Z][a-zA-Z /]+?)\s{2,}(.+)$', s)
-    if m:
-        return (m.group(1).strip(), m.group(2).strip())
-    return None
-
-
-def _verdict_badge(text):
-    """Extract verdict from option body and return a styled badge string."""
-    low = text.lower()
-    if 'is correct' in low:
-        return '<span class="exp-badge exp-correct">✓ Correct</span>'
-    elif 'is incorrect' in low or 'is not correct' in low:
-        return '<span class="exp-badge exp-wrong">✗ Incorrect</span>'
-    return ''
-
-
-def _blocks_to_html(blocks):
-    html = ''
+def _html(blocks):
+    out = []
     for b in blocks:
         t = b['type']
+        e = escape
 
         if t == 'para':
-            html += f'<p class="exp-para">{escape(b["content"])}</p>'
+            out.append(f'<p class="exp-para">{e(b["text"])}</p>')
 
         elif t == 'heading':
-            html += f'<div class="exp-section-heading"><span>{escape(b["content"])}</span></div>'
+            icon = '<svg class="exp-head-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.396 0 2.698.37 3.8 1.015A6.98 6.98 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>'
+            out.append(f'<div class="exp-section-heading">{icon}<span>{e(b["text"])}</span></div>')
 
         elif t == 'statement':
-            body_html = ''
-            for line in b['body']:
-                if line.startswith('•'):
-                    body_html += f'<li>{escape(line.lstrip("•").strip())}</li>'
-                else:
-                    body_html += f'<p class="exp-stmt-body">{escape(line)}</p>'
-            # Wrap bullets in ul if any
-            if '<li>' in body_html:
-                body_html = re.sub(r'(<li>.*?</li>)', r'<ul class="exp-bullets">\1</ul>', body_html, flags=re.DOTALL)
-
-            # Verdict from last body line
-            verdict = ''
-            for line in reversed(b['body']):
-                v = _verdict_badge(line)
-                if v:
-                    verdict = v
-                    break
-
-            html += f'''<div class="exp-statement">
-  <div class="exp-stmt-num">{escape(b["num"])}</div>
-  <div class="exp-stmt-content">
-    <div class="exp-stmt-heading">{escape(b["heading"])} {verdict}</div>
-    {body_html}
-  </div>
-</div>'''
+            badge = _verdict_badge(b.get('verdict'))
+            body_text = e(b['text'])
+            bullets_html = ''
+            if b.get('bullets'):
+                items_li = ''.join(f'<li>{e(item)}</li>' for item in b['bullets'])
+                bullets_html = f'<ul class="exp-bullets exp-bullets-sm">{items_li}</ul>'
+            out.append(
+                f'<div class="exp-statement">'
+                f'  <div class="exp-stmt-num">{e(b["num"])}</div>'
+                f'  <div class="exp-stmt-content">'
+                f'    <p class="exp-stmt-text">{body_text}</p>'
+                f'    {bullets_html}'
+                f'    {badge}'
+                f'  </div>'
+                f'</div>'
+            )
 
         elif t == 'option':
-            verdict = _verdict_badge(b['content'])
-            opt_key = b['key']
-            html += f'''<div class="exp-option">
-  <div class="exp-opt-key">({opt_key})</div>
-  <div class="exp-opt-body">
-    <p>{escape(b["content"])}</p>
-    {verdict}
-  </div>
-</div>'''
+            badge = _verdict_badge(b.get('verdict'))
+            # Colour the option key chip based on verdict
+            chip_cls = {
+                'correct': 'exp-opt-key exp-opt-key--correct',
+                'wrong':   'exp-opt-key exp-opt-key--wrong',
+                None:      'exp-opt-key',
+            }[b.get('verdict')]
+            out.append(
+                f'<div class="exp-option">'
+                f'  <div class="{chip_cls}">({e(b["key"])})</div>'
+                f'  <div class="exp-opt-body">'
+                f'    <p>{e(b["text"])}</p>'
+                f'    {badge}'
+                f'  </div>'
+                f'</div>'
+            )
 
         elif t == 'bullets':
-            items_html = ''.join(
-                f'<li>{escape(item[1])}</li>' for item in b['items']
-            )
-            html += f'<ul class="exp-bullets">{items_html}</ul>'
-
-        elif t == 'table':
-            rows_html = ''.join(
-                f'<tr><th>{escape(k)}</th><td>{escape(v)}</td></tr>'
-                for k, v in b['rows']
-            )
-            html += f'<div class="exp-table-wrap"><table class="exp-table">{rows_html}</table></div>'
+            items_li = ''.join(f'<li>{e(item)}</li>' for item in b['items'])
+            out.append(f'<ul class="exp-bullets">{items_li}</ul>')
 
         elif t == 'news':
-            html += f'''<div class="exp-news-banner">
-  <span class="exp-news-label">📰 IN NEWS</span>
-  <span class="exp-news-text">{escape(b["content"])}</span>
-</div>'''
+            news_icon = '📰'
+            out.append(
+                f'<div class="exp-news-banner">'
+                f'  <span class="exp-news-label">{news_icon} IN NEWS</span>'
+                f'  <span class="exp-news-text">{e(b["text"])}</span>'
+                f'</div>'
+            )
 
-    return html
+    return ''.join(out)
 
 
 @register.filter(name='format_explanation')
 def format_explanation(text):
-    """Convert raw explanation text into rich structured HTML."""
     if not text:
         return ''
-    blocks = _parse_blocks(str(text))
-    return mark_safe(_blocks_to_html(blocks))
+    blocks = _parse(str(text))
+    return mark_safe(_html(blocks))

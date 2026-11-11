@@ -86,98 +86,127 @@
             pointer-events: auto !important;
         }
 
-        /* ─────────────────────────────────────────
-           Explanation Renderer – Structured Layout
-        ───────────────────────────────────────── */
+        /* ══════════════════════════════════════════════════════
+           EXPLANATION RENDERER — Full Structured Layout System
+        ══════════════════════════════════════════════════════ */
+
+        /* Root wrapper */
         .exp-wrap {
-            font-size: 0.82rem;
-            line-height: 1.65;
+            font-size: 0.84rem;
+            line-height: 1.7;
             color: #334155;
         }
         .dark .exp-wrap { color: #cbd5e1; }
 
-        /* Plain paragraph */
+        /* ── Plain paragraph ── */
         .exp-para {
-            margin-bottom: 0.6rem;
+            margin-bottom: 0.75rem;
             text-align: justify;
             color: #475569;
+            padding: 0.5rem 0.75rem;
+            border-left: 3px solid #e2e8f0;
+            border-radius: 0 0.5rem 0.5rem 0;
+            background: #f8fafc;
         }
-        .dark .exp-para { color: #94a3b8; }
+        .dark .exp-para {
+            color: #94a3b8;
+            border-left-color: #334155;
+            background: #1e293b;
+        }
 
         /* ── Numbered Statement card ── */
         .exp-statement {
             display: flex;
-            gap: 0.75rem;
+            gap: 0.85rem;
             align-items: flex-start;
-            margin-bottom: 0.85rem;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border: 1px solid #e2e8f0;
+            margin-bottom: 0.9rem;
+            background: linear-gradient(135deg, #f0f7ff 0%, #f8fafc 100%);
+            border: 1px solid #bae0fd;
             border-left: 4px solid #0c8fe9;
-            border-radius: 0.9rem;
-            padding: 0.75rem 1rem;
-            transition: box-shadow 0.2s;
+            border-radius: 0 1rem 1rem 0;
+            padding: 0.9rem 1.1rem;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .exp-statement::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(12,143,233,0.04) 0%, transparent 60%);
+            pointer-events: none;
         }
         .dark .exp-statement {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border-color: #334155;
+            background: linear-gradient(135deg, #082949 0%, #0f172a 100%);
+            border-color: #074c85;
             border-left-color: #36abf7;
         }
-        .exp-statement:hover { box-shadow: 0 4px 16px rgba(12,143,233,0.10); }
+        .dark .exp-statement::before {
+            background: linear-gradient(90deg, rgba(54,171,247,0.07) 0%, transparent 60%);
+        }
+        .exp-statement:hover {
+            box-shadow: 0 6px 20px rgba(12,143,233,0.12);
+            transform: translateX(2px);
+        }
+
+        /* Circle number badge */
         .exp-stmt-num {
             flex-shrink: 0;
-            width: 1.75rem;
-            height: 1.75rem;
+            width: 2rem;
+            height: 2rem;
             border-radius: 50%;
-            background: #0c8fe9;
+            background: linear-gradient(135deg, #0c8fe9, #0271c7);
             color: #fff;
-            font-weight: 800;
-            font-size: 0.75rem;
+            font-weight: 900;
+            font-size: 0.78rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 0.1rem;
+            box-shadow: 0 2px 8px rgba(12,143,233,0.35);
+            margin-top: 0.05rem;
         }
-        .dark .exp-stmt-num { background: #0271c7; }
+        .dark .exp-stmt-num {
+            background: linear-gradient(135deg, #036dd3, #035aa1);
+            box-shadow: 0 2px 8px rgba(3,109,211,0.4);
+        }
+
         .exp-stmt-content { flex: 1; min-width: 0; }
-        .exp-stmt-heading {
-            font-weight: 700;
-            font-size: 0.83rem;
+        .exp-stmt-text {
             color: #1e293b;
-            margin-bottom: 0.3rem;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-        }
-        .dark .exp-stmt-heading { color: #e2e8f0; }
-        .exp-stmt-body {
-            color: #64748b;
-            font-size: 0.8rem;
+            font-size: 0.83rem;
+            font-weight: 500;
+            line-height: 1.65;
+            margin-bottom: 0.35rem;
             text-align: justify;
-            margin-bottom: 0.2rem;
         }
-        .dark .exp-stmt-body { color: #94a3b8; }
+        .dark .exp-stmt-text { color: #e2e8f0; }
 
         /* ── Option Analysis card ── */
         .exp-option {
             display: flex;
-            gap: 0.65rem;
+            gap: 0.75rem;
             align-items: flex-start;
-            margin-bottom: 0.6rem;
+            margin-bottom: 0.65rem;
             border: 1px solid #e2e8f0;
-            border-radius: 0.75rem;
-            padding: 0.65rem 0.9rem;
+            border-radius: 0.85rem;
+            padding: 0.75rem 1rem;
             background: #f8fafc;
+            transition: all 0.15s ease;
         }
         .dark .exp-option {
             background: #1e293b;
             border-color: #334155;
         }
+        .exp-option:hover {
+            box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+        }
+
+        /* Option key chip — neutral / correct / wrong */
         .exp-opt-key {
             flex-shrink: 0;
-            width: 1.6rem;
-            height: 1.6rem;
-            border-radius: 0.4rem;
+            width: 1.9rem;
+            height: 1.9rem;
+            border-radius: 0.5rem;
             background: #e0effe;
             color: #0271c7;
             font-weight: 900;
@@ -185,153 +214,226 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 1.5px solid #bae0fd;
+            transition: all 0.15s;
         }
-        .dark .exp-opt-key { background: #082949; color: #7cc7fb; }
-        .exp-opt-body { flex: 1; min-width: 0; font-size: 0.8rem; color: #475569; text-align: justify; }
+        .dark .exp-opt-key { background: #082949; color: #7cc7fb; border-color: #074c85; }
+        .exp-opt-key--correct {
+            background: #dcfce7; color: #15803d;
+            border-color: #86efac;
+        }
+        .dark .exp-opt-key--correct { background: #052e16; color: #4ade80; border-color: #166534; }
+        .exp-opt-key--wrong {
+            background: #fee2e2; color: #b91c1c;
+            border-color: #fca5a5;
+        }
+        .dark .exp-opt-key--wrong { background: #450a0a; color: #f87171; border-color: #991b1b; }
+
+        .exp-opt-body { flex: 1; min-width: 0; font-size: 0.81rem; color: #475569; text-align: justify; line-height: 1.6; }
         .dark .exp-opt-body { color: #94a3b8; }
-        .exp-opt-body p { margin-bottom: 0.3rem; }
+        .exp-opt-body p { margin: 0 0 0.3rem; }
 
         /* ── Verdict Badges ── */
         .exp-badge {
             display: inline-flex;
             align-items: center;
-            gap: 0.2rem;
+            gap: 0.3rem;
             font-size: 0.65rem;
             font-weight: 800;
-            padding: 0.15rem 0.55rem;
+            padding: 0.2rem 0.6rem;
             border-radius: 999px;
             vertical-align: middle;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.04em;
+            margin-top: 0.35rem;
+        }
+        .exp-icon {
+            width: 0.7rem;
+            height: 0.7rem;
+            flex-shrink: 0;
         }
         .exp-correct {
             background: #dcfce7;
             color: #15803d;
-            border: 1px solid #bbf7d0;
+            border: 1px solid #86efac;
         }
         .exp-wrong {
             background: #fee2e2;
             color: #b91c1c;
-            border: 1px solid #fecaca;
+            border: 1px solid #fca5a5;
         }
         .dark .exp-correct { background: #052e16; color: #4ade80; border-color: #166534; }
         .dark .exp-wrong  { background: #450a0a; color: #f87171; border-color: #991b1b; }
 
         /* ── Section heading ── */
         .exp-section-heading {
-            margin: 0.9rem 0 0.45rem;
+            margin: 1rem 0 0.5rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
+        .exp-head-icon {
+            width: 0.9rem;
+            height: 0.9rem;
+            color: #0271c7;
+            flex-shrink: 0;
+        }
+        .dark .exp-head-icon { color: #7cc7fb; }
         .exp-section-heading span {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.09em;
             color: #0271c7;
-            padding: 0.2rem 0.75rem;
+            padding: 0.22rem 0.8rem;
             border-radius: 999px;
-            background: #e0effe;
+            background: linear-gradient(90deg, #e0effe, #f0f7ff);
+            border: 1px solid #bae0fd;
         }
         .dark .exp-section-heading span {
             color: #7cc7fb;
-            background: #082949;
+            background: linear-gradient(90deg, #082949, #0c406e22);
+            border-color: #074c85;
         }
 
         /* ── Bullet list ── */
         .exp-bullets {
             list-style: none;
             padding: 0;
-            margin: 0.35rem 0 0.6rem 0;
+            margin: 0.4rem 0 0.65rem 0;
             display: flex;
             flex-direction: column;
-            gap: 0.25rem;
+            gap: 0.3rem;
         }
         .exp-bullets li {
             display: flex;
             align-items: flex-start;
-            gap: 0.5rem;
+            gap: 0.55rem;
             font-size: 0.8rem;
             color: #475569;
-            padding: 0.2rem 0;
+            padding: 0.25rem 0.5rem 0.25rem 0;
+            line-height: 1.55;
         }
         .dark .exp-bullets li { color: #94a3b8; }
         .exp-bullets li::before {
             content: "▸";
             color: #0c8fe9;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             flex-shrink: 0;
-            margin-top: 0.07rem;
+            margin-top: 0.18rem;
             font-weight: 900;
         }
-
-        /* ── Key-Value Table ── */
-        .exp-table-wrap {
-            overflow-x: auto;
-            margin: 0.5rem 0 0.8rem;
-            border-radius: 0.75rem;
-            border: 1px solid #e2e8f0;
-        }
-        .dark .exp-table-wrap { border-color: #334155; }
-        .exp-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.78rem;
-        }
-        .exp-table th, .exp-table td {
-            padding: 0.45rem 0.85rem;
-            border-bottom: 1px solid #f1f5f9;
-            text-align: left;
-        }
-        .dark .exp-table th, .dark .exp-table td { border-color: #1e293b; }
-        .exp-table th {
-            font-weight: 700;
-            color: #0271c7;
-            white-space: nowrap;
-            background: #f0f7ff;
-            width: 35%;
-        }
-        .dark .exp-table th { background: #082949; color: #7cc7fb; }
-        .exp-table td { color: #334155; }
-        .dark .exp-table td { color: #cbd5e1; }
-        .exp-table tr:last-child th,
-        .exp-table tr:last-child td { border-bottom: none; }
+        /* Smaller bullets inside statement cards */
+        .exp-bullets-sm li { font-size: 0.77rem; padding: 0.15rem 0; }
+        .exp-bullets-sm li::before { font-size: 0.65rem; }
 
         /* ── IN NEWS banner ── */
         .exp-news-banner {
-            margin-top: 1rem;
-            padding: 0.65rem 1rem;
-            border-radius: 0.75rem;
-            background: linear-gradient(90deg, #fff7ed, #fffbeb);
+            margin-top: 1.1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.9rem;
+            background: linear-gradient(90deg, #fff7ed 0%, #fffbeb 100%);
             border: 1px solid #fed7aa;
+            border-left: 4px solid #f97316;
             display: flex;
             align-items: flex-start;
-            gap: 0.65rem;
+            gap: 0.75rem;
         }
         .dark .exp-news-banner {
-            background: linear-gradient(90deg, #1c0a00, #1a1000);
+            background: linear-gradient(90deg, #1c0a00 0%, #1a0f00 100%);
             border-color: #9a3412;
+            border-left-color: #f97316;
         }
         .exp-news-label {
             flex-shrink: 0;
-            font-size: 0.65rem;
+            font-size: 0.63rem;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.07em;
             color: #c2410c;
-            padding: 0.2rem 0.6rem;
+            padding: 0.22rem 0.65rem;
             border-radius: 999px;
             background: #fed7aa;
+            border: 1px solid #fdba74;
             white-space: nowrap;
         }
-        .dark .exp-news-label { background: #431407; color: #fb923c; }
+        .dark .exp-news-label { background: #431407; color: #fb923c; border-color: #9a3412; }
         .exp-news-text {
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             color: #9a3412;
             font-weight: 600;
-            line-height: 1.5;
+            line-height: 1.55;
         }
         .dark .exp-news-text { color: #fdba74; }
+
+        /* ══ Customization Panel ══ */
+        #exp-custom-panel {
+            display: none;
+            position: fixed;
+            bottom: 1.25rem;
+            right: 1.25rem;
+            z-index: 50;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 1rem 1.15rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+            width: 220px;
+            font-size: 0.75rem;
+        }
+        .dark #exp-custom-panel {
+            background: #1e293b;
+            border-color: #334155;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        #exp-custom-panel.open { display: block; animation: fadeInUp 0.2s ease; }
+        #exp-custom-fab {
+            position: fixed;
+            bottom: 1.25rem;
+            right: 1.25rem;
+            z-index: 51;
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0c8fe9, #0271c7);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px rgba(12,143,233,0.4);
+            transition: all 0.2s;
+        }
+        #exp-custom-fab:hover { transform: scale(1.1) rotate(15deg); }
+
+        /* Density classes toggled by JS */
+        .exp-wrap.density-compact .exp-statement { padding: 0.55rem 0.8rem; margin-bottom: 0.6rem; }
+        .exp-wrap.density-compact .exp-option    { padding: 0.5rem 0.75rem; margin-bottom: 0.4rem; }
+        .exp-wrap.density-compact .exp-para      { padding: 0.3rem 0.6rem; margin-bottom: 0.5rem; }
+        .exp-wrap.density-spacious .exp-statement { padding: 1.2rem 1.4rem; margin-bottom: 1.2rem; }
+        .exp-wrap.density-spacious .exp-option    { padding: 1rem 1.2rem; margin-bottom: 0.9rem; }
+        .exp-wrap.density-spacious .exp-para      { padding: 0.75rem 1rem; margin-bottom: 1rem; }
+
+        /* Font size overrides */
+        .exp-wrap.text-xs-override  { font-size: 0.75rem !important; }
+        .exp-wrap.text-sm-override  { font-size: 0.84rem !important; }
+        .exp-wrap.text-md-override  { font-size: 0.95rem !important; }
+        .exp-wrap.text-lg-override  { font-size: 1.05rem !important; }
+
+        /* Accent colour presets  */
+        .exp-wrap.accent-blue  { --exp-accent: #0c8fe9; --exp-accent-bg: #e0effe; }
+        .exp-wrap.accent-green { --exp-accent: #16a34a; --exp-accent-bg: #dcfce7; }
+        .exp-wrap.accent-purple{ --exp-accent: #7c3aed; --exp-accent-bg: #ede9fe; }
+        .exp-wrap.accent-rose  { --exp-accent: #e11d48; --exp-accent-bg: #ffe4e6; }
+        .exp-wrap.accent-green  .exp-statement { border-left-color: #16a34a; }
+        .exp-wrap.accent-green  .exp-stmt-num  { background: linear-gradient(135deg,#16a34a,#15803d); }
+        .exp-wrap.accent-green  .exp-bullets li::before { color: #16a34a; }
+        .exp-wrap.accent-purple .exp-statement { border-left-color: #7c3aed; }
+        .exp-wrap.accent-purple .exp-stmt-num  { background: linear-gradient(135deg,#7c3aed,#6d28d9); }
+        .exp-wrap.accent-purple .exp-bullets li::before { color: #7c3aed; }
+        .exp-wrap.accent-rose   .exp-statement { border-left-color: #e11d48; }
+        .exp-wrap.accent-rose   .exp-stmt-num  { background: linear-gradient(135deg,#e11d48,#be123c); }
+        .exp-wrap.accent-rose   .exp-bullets li::before { color: #e11d48; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200">
@@ -704,5 +806,133 @@
         });
     </script>
     {% block extra_js %}{% endblock %}
+
+    <!-- ══ Explanation Customization FAB + Panel ══ -->
+    <!-- Only shown when an explanation section exists on the page -->
+    <button id="exp-custom-fab" onclick="toggleExpPanel()" title="Customize Explanation Layout"
+            style="display:none"
+            class="fixed bottom-5 right-5 z-50 w-11 h-11 rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 text-white shadow-lg shadow-brand-500/30 flex items-center justify-center transition-all hover:scale-110 hover:rotate-12 border-2 border-white/20">
+        <i data-lucide="sliders" class="w-4 h-4"></i>
+    </button>
+
+    <div id="exp-custom-panel" class="fixed bottom-20 right-5 z-50 hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-2xl w-56 text-xs font-semibold space-y-3 animate-fadeInUp">
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+            <span class="font-black text-slate-900 dark:text-white text-[11px] uppercase tracking-widest flex items-center gap-1.5">
+                <i data-lucide="sliders" class="w-3.5 h-3.5 text-brand-500"></i> Layout Settings
+            </span>
+            <button onclick="toggleExpPanel()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
+        </div>
+
+        <!-- Font Size -->
+        <div class="space-y-1.5">
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Font Size</p>
+            <div class="flex gap-1">
+                <button onclick="setExpFont('xs')" id="efont-xs" class="exp-ctrl-btn flex-1 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-[10px] font-black hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-950/40 dark:hover:text-brand-300 transition-colors">XS</button>
+                <button onclick="setExpFont('sm')" id="efont-sm" class="exp-ctrl-btn flex-1 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-[11px] font-black hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-950/40 dark:hover:text-brand-300 transition-colors">SM</button>
+                <button onclick="setExpFont('md')" id="efont-md" class="exp-ctrl-btn flex-1 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-[12px] font-black hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-950/40 dark:hover:text-brand-300 transition-colors">MD</button>
+                <button onclick="setExpFont('lg')" id="efont-lg" class="exp-ctrl-btn flex-1 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-[13px] font-black hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-950/40 dark:hover:text-brand-300 transition-colors">LG</button>
+            </div>
+        </div>
+
+        <!-- Density -->
+        <div class="space-y-1.5">
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Density</p>
+            <div class="flex gap-1">
+                <button onclick="setExpDensity('compact')"  id="dens-compact"  class="exp-ctrl-btn flex-1 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-[10px] font-bold hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-950/40 dark:hover:text-brand-300 transition-colors">Compact</button>
+                <button onclick="setExpDensity('normal')"   id="dens-normal"   class="exp-ctrl-btn flex-1 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-[10px] font-bold hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-950/40 dark:hover:text-brand-300 transition-colors">Normal</button>
+                <button onclick="setExpDensity('spacious')" id="dens-spacious" class="exp-ctrl-btn flex-1 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-[10px] font-bold hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-950/40 dark:hover:text-brand-300 transition-colors">Airy</button>
+            </div>
+        </div>
+
+        <!-- Accent Colour -->
+        <div class="space-y-1.5">
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Accent Colour</p>
+            <div class="flex gap-1.5 items-center">
+                <button onclick="setExpAccent('blue')"   class="w-6 h-6 rounded-full bg-blue-500   border-2 border-white dark:border-slate-700 shadow hover:scale-125 transition-transform" title="Blue"></button>
+                <button onclick="setExpAccent('green')"  class="w-6 h-6 rounded-full bg-green-600  border-2 border-white dark:border-slate-700 shadow hover:scale-125 transition-transform" title="Green"></button>
+                <button onclick="setExpAccent('purple')" class="w-6 h-6 rounded-full bg-violet-600 border-2 border-white dark:border-slate-700 shadow hover:scale-125 transition-transform" title="Purple"></button>
+                <button onclick="setExpAccent('rose')"   class="w-6 h-6 rounded-full bg-rose-600   border-2 border-white dark:border-slate-700 shadow hover:scale-125 transition-transform" title="Rose"></button>
+            </div>
+        </div>
+
+        <!-- Reset -->
+        <button onclick="resetExpSettings()" class="w-full py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-[10px] font-black text-slate-500 hover:text-rose-600 hover:border-rose-300 transition-colors">
+            Reset to Default
+        </button>
+    </div>
+
+    <script>
+        // ── Explanation Customization System ──
+        (function() {
+            const STORE_KEY = 'exp-prefs';
+            const FONTS    = ['xs','sm','md','lg'];
+            const DENSITIES = ['compact','normal','spacious'];
+            const ACCENTS  = ['blue','green','purple','rose'];
+
+            function getPrefs() {
+                try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { return {}; }
+            }
+            function savePrefs(p) { localStorage.setItem(STORE_KEY, JSON.stringify(p)); }
+
+            function applyAll(prefs) {
+                document.querySelectorAll('.exp-wrap').forEach(el => {
+                    // font
+                    FONTS.forEach(f => el.classList.remove('text-'+f+'-override'));
+                    if (prefs.font && prefs.font !== 'sm') el.classList.add('text-'+prefs.font+'-override');
+                    // density
+                    DENSITIES.forEach(d => el.classList.remove('density-'+d));
+                    if (prefs.density && prefs.density !== 'normal') el.classList.add('density-'+prefs.density);
+                    // accent
+                    ACCENTS.forEach(a => el.classList.remove('accent-'+a));
+                    if (prefs.accent && prefs.accent !== 'blue') el.classList.add('accent-'+prefs.accent);
+                });
+                // highlight active buttons
+                FONTS.forEach(f => {
+                    const btn = document.getElementById('efont-'+f);
+                    if (btn) btn.classList.toggle('bg-brand-600', (prefs.font||'sm') === f);
+                    if (btn) btn.classList.toggle('text-white',   (prefs.font||'sm') === f);
+                    if (btn) btn.classList.toggle('border-brand-500', (prefs.font||'sm') === f);
+                });
+                DENSITIES.forEach(d => {
+                    const btn = document.getElementById('dens-'+d);
+                    if (btn) btn.classList.toggle('bg-brand-600', (prefs.density||'normal') === d);
+                    if (btn) btn.classList.toggle('text-white',   (prefs.density||'normal') === d);
+                    if (btn) btn.classList.toggle('border-brand-500', (prefs.density||'normal') === d);
+                });
+            }
+
+            window.toggleExpPanel = function() {
+                const panel = document.getElementById('exp-custom-panel');
+                panel.classList.toggle('hidden');
+                if (!panel.classList.contains('hidden')) applyAll(getPrefs());
+            };
+            window.setExpFont = function(f) {
+                const p = getPrefs(); p.font = f; savePrefs(p); applyAll(p);
+            };
+            window.setExpDensity = function(d) {
+                const p = getPrefs(); p.density = d; savePrefs(p); applyAll(p);
+            };
+            window.setExpAccent = function(a) {
+                const p = getPrefs(); p.accent = a; savePrefs(p); applyAll(p);
+                showToast('Accent changed to ' + a.charAt(0).toUpperCase() + a.slice(1));
+            };
+            window.resetExpSettings = function() {
+                savePrefs({}); applyAll({});
+                showToast('Layout reset to default');
+                document.getElementById('exp-custom-panel').classList.add('hidden');
+            };
+
+            // Show FAB only when exp-wrap exists on page
+            document.addEventListener('DOMContentLoaded', () => {
+                const hasExp = document.querySelector('.exp-wrap');
+                const fab = document.getElementById('exp-custom-fab');
+                if (hasExp && fab) { fab.style.display = 'flex'; lucide.createIcons(); }
+                applyAll(getPrefs());
+            });
+        })();
+    </script>
 </body>
 </html>
