@@ -3,30 +3,34 @@
 {% block title %}Mock Exam Runner - UPSC Prelims PYQ Portal{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="space-y-6 animate-fadeInUp">
 
-    <!-- Exam Runner Top Header -->
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-wrap items-center justify-between gap-4">
+    <!-- Exam Runner Top Header with Pulsing Live Timer -->
+    <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-sm flex flex-wrap items-center justify-between gap-4">
         <div>
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-100 text-brand-800 dark:bg-brand-950 dark:text-brand-300">
-                Official UPSC Simulation
-            </span>
-            <h2 class="text-lg font-bold text-slate-900 dark:text-white mt-0.5">{{ session.title }}</h2>
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-brand-100 text-brand-800 dark:bg-brand-950 dark:text-brand-300">
+                    <span class="w-2 h-2 rounded-full bg-brand-500 animate-ping"></span>
+                    Live UPSC Simulation
+                </span>
+                <span class="text-xs text-slate-400 font-semibold hidden sm:inline">• Negative Marking Active (-0.66)</span>
+            </div>
+            <h2 class="text-lg font-black text-slate-900 dark:text-white mt-1">{{ session.title }}</h2>
         </div>
 
         <!-- Timer & Submit Actions -->
         <div class="flex items-center gap-4">
             <!-- Timer Clock -->
-            <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700">
+            <div class="flex items-center gap-2.5 bg-gradient-to-r from-slate-100 to-amber-50/50 dark:from-slate-800 dark:to-amber-950/20 px-4 py-2 rounded-2xl border border-amber-200/60 dark:border-amber-900/40 shadow-sm">
                 <i data-lucide="clock" class="w-5 h-5 text-amber-500 animate-pulse"></i>
                 <div>
-                    <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Time Left</span>
-                    <span id="countdown-timer" class="text-lg font-black font-mono text-slate-900 dark:text-white">00:00:00</span>
+                    <span class="block text-[9px] text-slate-400 font-black uppercase tracking-wider">Time Remaining</span>
+                    <span id="countdown-timer" class="text-xl font-black font-mono text-slate-900 dark:text-white">00:00:00</span>
                 </div>
             </div>
 
             <!-- Submit Exam Button -->
-            <button type="button" onclick="openSubmitModal()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-2">
+            <button type="button" onclick="openSubmitModal()" class="px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md shadow-emerald-600/25 transition-all hover:scale-105 flex items-center gap-2">
                 <i data-lucide="check-circle-2" class="w-4 h-4"></i>
                 Submit Exam
             </button>
@@ -38,82 +42,110 @@
 
         <!-- Question View (Left 3 Columns) -->
         <div class="lg:col-span-3 space-y-4">
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden flex flex-col justify-between min-h-[500px]">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden flex flex-col justify-between min-h-[520px]">
                 
                 <!-- Question Header -->
-                <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
+                <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/60 dark:bg-slate-900/50">
                     <div class="flex items-center gap-2">
-                        <span id="q-order-badge" class="px-3 py-1 rounded-lg text-xs font-black bg-brand-600 text-white">
+                        <span id="q-order-badge" class="px-3.5 py-1 rounded-xl text-xs font-black bg-brand-600 text-white shadow-sm">
                             Question 1
                         </span>
-                        <span id="q-subject-badge" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                        <span id="q-subject-badge" class="px-3 py-1 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
                             Subject
                         </span>
                     </div>
-                    <span id="q-status-badge" class="text-xs font-bold text-slate-400">
-                        Not Answered
-                    </span>
+                    <div class="flex items-center gap-3">
+                        <span class="text-[11px] font-semibold text-slate-400 hidden sm:inline">Shortcuts: 1-4 (select) • S (Save & Next) • M (Review)</span>
+                        <span id="q-status-badge" class="text-xs font-bold text-slate-400">
+                            Not Answered
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Question Core Body -->
-                <div class="p-6 sm:p-8 space-y-6 flex-1">
+                <div class="p-6 sm:p-8 space-y-5 flex-1">
                     <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">Topic</span>
-                        <h3 id="q-topic" class="text-xl font-extrabold text-slate-900 dark:text-white mt-0.5"></h3>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-brand-600 dark:text-brand-400 block mb-0.5">Topic</span>
+                        <h3 id="q-topic" class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white"></h3>
                     </div>
 
                     <div id="q-text" class="text-slate-800 dark:text-slate-200 text-base leading-relaxed whitespace-pre-line font-medium"></div>
 
-                    <!-- 4 Radio Options -->
+                    <!-- 4 Radio Options with Strike-Through Elimination support -->
                     <div class="space-y-3 pt-2" id="exam-options">
-                        <label class="exam-opt-label flex items-start gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-all">
-                            <input type="radio" name="opt_choice" value="a" onchange="onSelectOption('a')" class="mt-1 text-brand-600 focus:ring-brand-500">
-                            <div>
-                                <span class="font-bold text-xs uppercase text-slate-400 mr-2">Option A</span>
-                                <span id="opt-text-a" class="text-sm text-slate-800 dark:text-slate-200 font-medium"></span>
-                            </div>
-                        </label>
-                        <label class="exam-opt-label flex items-start gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-all">
-                            <input type="radio" name="opt_choice" value="b" onchange="onSelectOption('b')" class="mt-1 text-brand-600 focus:ring-brand-500">
-                            <div>
-                                <span class="font-bold text-xs uppercase text-slate-400 mr-2">Option B</span>
-                                <span id="opt-text-b" class="text-sm text-slate-800 dark:text-slate-200 font-medium"></span>
-                            </div>
-                        </label>
-                        <label class="exam-opt-label flex items-start gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-all">
-                            <input type="radio" name="opt_choice" value="c" onchange="onSelectOption('c')" class="mt-1 text-brand-600 focus:ring-brand-500">
-                            <div>
-                                <span class="font-bold text-xs uppercase text-slate-400 mr-2">Option C</span>
-                                <span id="opt-text-c" class="text-sm text-slate-800 dark:text-slate-200 font-medium"></span>
-                            </div>
-                        </label>
-                        <label class="exam-opt-label flex items-start gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-all">
-                            <input type="radio" name="opt_choice" value="d" onchange="onSelectOption('d')" class="mt-1 text-brand-600 focus:ring-brand-500">
-                            <div>
-                                <span class="font-bold text-xs uppercase text-slate-400 mr-2">Option D</span>
-                                <span id="opt-text-d" class="text-sm text-slate-800 dark:text-slate-200 font-medium"></span>
-                            </div>
-                        </label>
+                        
+                        <div class="exam-opt-wrapper relative group flex items-center">
+                            <label class="exam-opt-label flex-1 flex items-start gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-all hover:shadow-sm" data-opt="a">
+                                <input type="radio" name="opt_choice" value="a" onchange="onSelectOption('a')" class="mt-1 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <div class="flex-1">
+                                    <span class="font-black text-xs uppercase text-slate-400 mr-2">Option A</span>
+                                    <span id="opt-text-a" class="text-sm text-slate-800 dark:text-slate-200 font-medium"></span>
+                                </div>
+                            </label>
+                            <button type="button" onclick="toggleExamEliminate('a', this, event)" title="Eliminate option (Strike-through)" class="absolute right-3 px-2 py-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition-all opacity-0 group-hover:opacity-100">
+                                ✕ Eliminate
+                            </button>
+                        </div>
+
+                        <div class="exam-opt-wrapper relative group flex items-center">
+                            <label class="exam-opt-label flex-1 flex items-start gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-all hover:shadow-sm" data-opt="b">
+                                <input type="radio" name="opt_choice" value="b" onchange="onSelectOption('b')" class="mt-1 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <div class="flex-1">
+                                    <span class="font-black text-xs uppercase text-slate-400 mr-2">Option B</span>
+                                    <span id="opt-text-b" class="text-sm text-slate-800 dark:text-slate-200 font-medium"></span>
+                                </div>
+                            </label>
+                            <button type="button" onclick="toggleExamEliminate('b', this, event)" title="Eliminate option (Strike-through)" class="absolute right-3 px-2 py-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition-all opacity-0 group-hover:opacity-100">
+                                ✕ Eliminate
+                            </button>
+                        </div>
+
+                        <div class="exam-opt-wrapper relative group flex items-center">
+                            <label class="exam-opt-label flex-1 flex items-start gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-all hover:shadow-sm" data-opt="c">
+                                <input type="radio" name="opt_choice" value="c" onchange="onSelectOption('c')" class="mt-1 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <div class="flex-1">
+                                    <span class="font-black text-xs uppercase text-slate-400 mr-2">Option C</span>
+                                    <span id="opt-text-c" class="text-sm text-slate-800 dark:text-slate-200 font-medium"></span>
+                                </div>
+                            </label>
+                            <button type="button" onclick="toggleExamEliminate('c', this, event)" title="Eliminate option (Strike-through)" class="absolute right-3 px-2 py-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition-all opacity-0 group-hover:opacity-100">
+                                ✕ Eliminate
+                            </button>
+                        </div>
+
+                        <div class="exam-opt-wrapper relative group flex items-center">
+                            <label class="exam-opt-label flex-1 flex items-start gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-all hover:shadow-sm" data-opt="d">
+                                <input type="radio" name="opt_choice" value="d" onchange="onSelectOption('d')" class="mt-1 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <div class="flex-1">
+                                    <span class="font-black text-xs uppercase text-slate-400 mr-2">Option D</span>
+                                    <span id="opt-text-d" class="text-sm text-slate-800 dark:text-slate-200 font-medium"></span>
+                                </div>
+                            </label>
+                            <button type="button" onclick="toggleExamEliminate('d', this, event)" title="Eliminate option (Strike-through)" class="absolute right-3 px-2 py-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition-all opacity-0 group-hover:opacity-100">
+                                ✕ Eliminate
+                            </button>
+                        </div>
+
                     </div>
                 </div>
 
                 <!-- Navigation Action Buttons -->
-                <div class="p-4 sm:p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80 flex flex-wrap items-center justify-between gap-3">
+                <div class="p-4 sm:p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/80 flex flex-wrap items-center justify-between gap-3">
                     <div class="flex items-center gap-2">
-                        <button type="button" onclick="navigateQuestion(-1)" id="btn-prev" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5">
+                        <button type="button" onclick="navigateQuestion(-1)" id="btn-prev" class="px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all flex items-center gap-1.5 hover:scale-105">
                             <i data-lucide="chevron-left" class="w-4 h-4"></i> Previous
                         </button>
-                        <button type="button" onclick="clearCurrentSelection()" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-500 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                            Clear Response
+                        <button type="button" onclick="clearCurrentSelection()" class="px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-500 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">
+                            Clear Selection
                         </button>
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <button type="button" onclick="markForReviewAndNext()" class="px-4 py-2.5 rounded-xl border border-purple-300 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 text-xs font-bold hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors flex items-center gap-1.5">
-                            <i data-lucide="bookmark" class="w-4 h-4"></i> Mark for Review & Next
+                        <button type="button" onclick="markForReviewAndNext()" class="px-4 py-2.5 rounded-2xl border border-purple-300 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 text-xs font-bold hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-all flex items-center gap-1.5 hover:scale-105">
+                            <i data-lucide="bookmark" class="w-4 h-4"></i> Review & Next (M)
                         </button>
-                        <button type="button" onclick="saveAndNext()" id="btn-next" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-md shadow-brand-600/20 transition-all flex items-center gap-1.5">
-                            Save & Next <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        <button type="button" onclick="saveAndNext()" id="btn-next" class="px-5 py-2.5 rounded-2xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-black shadow-md shadow-brand-600/25 transition-all flex items-center gap-1.5 hover:scale-105">
+                            Save & Next (S) <i data-lucide="chevron-right" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
@@ -123,26 +155,27 @@
 
         <!-- Question Palette (Right Column) -->
         <div class="lg:col-span-1 space-y-4">
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Question Palette
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
+                <h4 class="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                    <span>Question Palette</span>
+                    <span class="text-[10px] text-brand-600 font-bold">Grid View</span>
                 </h4>
 
                 <!-- Legend Counts -->
-                <div class="grid grid-cols-2 gap-2 text-[11px] font-semibold">
-                    <div class="flex items-center gap-1.5 p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300">
+                <div class="grid grid-cols-2 gap-2 text-[11px] font-bold">
+                    <div class="flex items-center gap-1.5 p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300">
                         <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
                         <span>Answered: <strong id="count-answered">0</strong></span>
                     </div>
-                    <div class="flex items-center gap-1.5 p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300">
+                    <div class="flex items-center gap-1.5 p-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300">
                         <span class="w-3 h-3 rounded-full bg-rose-500"></span>
-                        <span>Unanswered: <strong id="count-unanswered">0</strong></span>
+                        <span>Pending: <strong id="count-unanswered">0</strong></span>
                     </div>
-                    <div class="flex items-center gap-1.5 p-1.5 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300">
+                    <div class="flex items-center gap-1.5 p-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300">
                         <span class="w-3 h-3 rounded-full bg-purple-500"></span>
                         <span>Review: <strong id="count-review">0</strong></span>
                     </div>
-                    <div class="flex items-center gap-1.5 p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                    <div class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                         <span class="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-600"></span>
                         <span>Not Visited: <strong id="count-notvisited">0</strong></span>
                     </div>
@@ -150,9 +183,7 @@
 
                 <!-- Palette Grid Numbers -->
                 <div class="pt-2 border-t border-slate-100 dark:border-slate-800 max-h-[420px] overflow-y-auto pr-1">
-                    <div id="palette-grid" class="grid grid-cols-5 gap-2">
-                        <!-- Populated by JS -->
-                    </div>
+                    <div id="palette-grid" class="grid grid-cols-5 gap-2"></div>
                 </div>
             </div>
         </div>
@@ -161,37 +192,39 @@
 
 </div>
 
-<!-- Submit Confirmation Modal -->
-<div id="submit-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+<!-- Submit Confirmation Modal with Confetti Preview -->
+<div id="submit-modal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-5 animate-popIn">
         <div class="flex items-center gap-3 text-emerald-600 dark:text-emerald-400">
-            <i data-lucide="help-circle" class="w-7 h-7"></i>
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Submit Examination?</h3>
+            <div class="w-10 h-10 rounded-2xl bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center">
+                <i data-lucide="help-circle" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-black text-slate-900 dark:text-white">Submit Examination?</h3>
+                <p class="text-xs text-slate-400">Review your final attempt summary before submission</p>
+            </div>
         </div>
-        <p class="text-xs text-slate-500 dark:text-slate-400">
-            Are you sure you want to finish your test? Review your attempt summary below:
-        </p>
 
-        <div class="grid grid-cols-3 gap-2 py-2 text-center">
-            <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
-                <span class="block text-xl font-black text-emerald-600 dark:text-emerald-400" id="modal-answered">0</span>
+        <div class="grid grid-cols-3 gap-2.5 py-1 text-center">
+            <div class="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
+                <span class="block text-2xl font-black text-emerald-600 dark:text-emerald-400" id="modal-answered">0</span>
                 <span class="text-[10px] font-bold uppercase text-emerald-800 dark:text-emerald-300">Answered</span>
             </div>
-            <div class="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800">
-                <span class="block text-xl font-black text-rose-600 dark:text-rose-400" id="modal-unanswered">0</span>
+            <div class="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800">
+                <span class="block text-2xl font-black text-rose-600 dark:text-rose-400" id="modal-unanswered">0</span>
                 <span class="text-[10px] font-bold uppercase text-rose-800 dark:text-rose-300">Unanswered</span>
             </div>
-            <div class="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800">
-                <span class="block text-xl font-black text-purple-600 dark:text-purple-400" id="modal-review">0</span>
+            <div class="p-3 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800">
+                <span class="block text-2xl font-black text-purple-600 dark:text-purple-400" id="modal-review">0</span>
                 <span class="text-[10px] font-bold uppercase text-purple-800 dark:text-purple-300">Marked</span>
             </div>
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-3">
-            <button type="button" onclick="closeSubmitModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                Cancel
+            <button type="button" onclick="closeSubmitModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                Return to Exam
             </button>
-            <button type="button" onclick="executeFinalSubmit()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-600/30 transition-all">
+            <button type="button" onclick="executeFinalSubmit()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black shadow-lg shadow-emerald-600/30 transition-all hover:scale-105">
                 Confirm & Submit Test
             </button>
         </div>
@@ -206,20 +239,22 @@
     const totalQuestions = questionsData.length;
     let currentIndex = 0;
     
-    // User responses state: { response_id: { option: 'a', marked: false, visited: true } }
+    // User responses state: { response_id: { option: 'a', marked: false, visited: true, eliminated: [] } }
     const answersState = {};
     questionsData.forEach(q => {
         answersState[q.response_id] = {
             option: q.selected_option || '',
             marked: q.is_marked || false,
             visited: q.is_visited || false,
+            eliminated: []
         };
     });
 
-    // Timer logic
+    // Timer logic with audio warning
     const durationMinutes = {{ session.duration_minutes }};
     let totalSeconds = durationMinutes * 60;
     let timeElapsed = 0;
+    let warned = false;
 
     const timerElement = document.getElementById('countdown-timer');
     const timerInterval = setInterval(() => {
@@ -239,8 +274,13 @@
 
         timerElement.innerText = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
         
-        if (totalSeconds < 300) {
-            timerElement.className = "text-lg font-black font-mono text-rose-600 dark:text-rose-400 animate-pulse";
+        if (totalSeconds <= 300) {
+            timerElement.className = "text-xl font-black font-mono text-rose-600 dark:text-rose-400 animate-pulse";
+            if (!warned) {
+                warned = true;
+                AudioFX.wrong();
+                showToast('⚠️ 5 Minutes Remaining in Exam!');
+            }
         }
     }, 1000);
 
@@ -261,39 +301,70 @@
         document.getElementById('opt-text-c').innerText = q.option_c;
         document.getElementById('opt-text-d').innerText = q.option_d;
 
-        // Reset radio buttons
-        const radios = document.getElementsByName('opt_choice');
-        radios.forEach(r => {
-            r.checked = (r.value === state.option);
-            const parentLabel = r.closest('.exam-opt-label');
-            if (r.checked) {
-                parentLabel.className = 'exam-opt-label flex items-start gap-3 p-4 rounded-xl border-2 border-brand-500 bg-brand-50/50 dark:bg-brand-950/40 text-brand-900 dark:text-brand-100 cursor-pointer transition-all shadow-sm';
+        // Reset radio buttons & elimination styles
+        const wrappers = document.querySelectorAll('.exam-opt-wrapper');
+        wrappers.forEach(w => {
+            const label = w.querySelector('.exam-opt-label');
+            const radio = w.querySelector('input[type="radio"]');
+            const optVal = label.dataset.opt;
+
+            radio.checked = (radio.value === state.option);
+            
+            // Elimination check
+            if (state.eliminated.includes(optVal)) {
+                label.classList.add('eliminated-opt');
             } else {
-                parentLabel.className = 'exam-opt-label flex items-start gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-all';
+                label.classList.remove('eliminated-opt');
+            }
+
+            if (radio.checked) {
+                label.className = 'exam-opt-label flex-1 flex items-start gap-3 p-4 rounded-2xl border-2 border-brand-500 bg-brand-50/70 dark:bg-brand-950/40 text-brand-900 dark:text-brand-100 cursor-pointer transition-all shadow-md';
+            } else {
+                label.className = 'exam-opt-label flex-1 flex items-start gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-all';
+                if (state.eliminated.includes(optVal)) label.classList.add('eliminated-opt');
             }
         });
 
-        // Prev button disable if at first question
         document.getElementById('btn-prev').disabled = (index === 0);
-        document.getElementById('btn-prev').classList.toggle('opacity-50', index === 0);
+        document.getElementById('btn-prev').classList.toggle('opacity-40', index === 0);
 
         updatePalette();
         lucide.createIcons();
     }
 
     function onSelectOption(val) {
+        AudioFX.click();
         const q = questionsData[currentIndex];
         answersState[q.response_id].option = val;
         renderQuestion(currentIndex);
     }
 
+    function toggleExamEliminate(optVal, btn, event) {
+        event.stopPropagation();
+        AudioFX.click();
+        const q = questionsData[currentIndex];
+        const state = answersState[q.response_id];
+        const idx = state.eliminated.indexOf(optVal);
+
+        if (idx === -1) {
+            state.eliminated.push(optVal);
+            if (state.option === optVal) state.option = '';
+            showToast(`Option (${optVal.toUpperCase()}) eliminated ✕`);
+        } else {
+            state.eliminated.splice(idx, 1);
+        }
+        renderQuestion(currentIndex);
+    }
+
     function clearCurrentSelection() {
+        AudioFX.click();
         const q = questionsData[currentIndex];
         answersState[q.response_id].option = '';
         renderQuestion(currentIndex);
     }
 
     function markForReviewAndNext() {
+        AudioFX.click();
         const q = questionsData[currentIndex];
         answersState[q.response_id].marked = !answersState[q.response_id].marked;
         if (currentIndex < totalQuestions - 1) {
@@ -304,6 +375,7 @@
     }
 
     function saveAndNext() {
+        AudioFX.click();
         if (currentIndex < totalQuestions - 1) {
             renderQuestion(currentIndex + 1);
         } else {
@@ -312,6 +384,7 @@
     }
 
     function navigateQuestion(offset) {
+        AudioFX.click();
         renderQuestion(currentIndex + offset);
     }
 
@@ -330,24 +403,24 @@
 
             if (state.marked) {
                 reviewCount++;
-                colorClasses = 'bg-purple-500 text-white font-bold border-purple-600';
+                colorClasses = 'bg-purple-500 text-white font-black border-purple-600 shadow-sm';
             } else if (state.option) {
                 answeredCount++;
-                colorClasses = 'bg-emerald-500 text-white font-bold border-emerald-600';
+                colorClasses = 'bg-emerald-500 text-white font-black border-emerald-600 shadow-sm';
             } else if (state.visited) {
                 unansweredCount++;
-                colorClasses = 'bg-rose-500 text-white font-bold border-rose-600';
+                colorClasses = 'bg-rose-500 text-white font-black border-rose-600 shadow-sm';
             } else {
                 notVisitedCount++;
             }
 
             if (idx === currentIndex) {
-                colorClasses += ' ring-2 ring-brand-500 ring-offset-2 dark:ring-offset-slate-900';
+                colorClasses += ' ring-2 ring-brand-500 ring-offset-2 dark:ring-offset-slate-900 scale-105';
             }
 
             const btn = document.createElement('button');
             btn.type = 'button';
-            btn.className = `w-8 h-8 rounded-lg text-xs flex items-center justify-center transition-all ${colorClasses}`;
+            btn.className = `w-8 h-8 rounded-xl text-xs flex items-center justify-center transition-all ${colorClasses}`;
             btn.innerText = idx + 1;
             btn.onclick = () => renderQuestion(idx);
             grid.appendChild(btn);
@@ -358,18 +431,19 @@
         document.getElementById('count-review').innerText = reviewCount;
         document.getElementById('count-notvisited').innerText = notVisitedCount;
 
-        // Modal counters
         document.getElementById('modal-answered').innerText = answeredCount;
         document.getElementById('modal-unanswered').innerText = unansweredCount + notVisitedCount;
         document.getElementById('modal-review').innerText = reviewCount;
     }
 
     function openSubmitModal() {
+        AudioFX.click();
         document.getElementById('submit-modal').classList.remove('hidden');
         lucide.createIcons();
     }
 
     function closeSubmitModal() {
+        AudioFX.click();
         document.getElementById('submit-modal').classList.add('hidden');
     }
 
@@ -397,6 +471,21 @@
         });
     }
 
+    // Keyboard Shortcuts for Exam Runner (1, 2, 3, 4, S, M, Arrows)
+    window.addEventListener('keydown', (e) => {
+        if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+        const key = e.key.toLowerCase();
+
+        if (key === '1') onSelectOption('a');
+        else if (key === '2') onSelectOption('b');
+        else if (key === '3') onSelectOption('c');
+        else if (key === '4') onSelectOption('d');
+        else if (key === 's' || key === 'enter') saveAndNext();
+        else if (key === 'm') markForReviewAndNext();
+        else if (key === 'arrowright') navigateQuestion(1);
+        else if (key === 'arrowleft') navigateQuestion(-1);
+    });
+
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -412,7 +501,6 @@
         return cookieValue;
     }
 
-    // Initial render
     renderQuestion(0);
 </script>
 {% endblock %}

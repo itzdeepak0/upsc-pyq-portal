@@ -5,15 +5,57 @@
 {% block content %}
 <div class="max-w-4xl mx-auto space-y-6">
 
+    <!-- Interactive Top Utility Bar: Streak Counter, Font Sizing, Speech & Shortcuts -->
+    <div class="flex flex-wrap items-center justify-between gap-3 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md p-3 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        
+        <!-- Live Streak & Practice Session Score -->
+        <div class="flex items-center gap-3">
+            <div id="streak-pill" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-black transition-all">
+                <span class="animate-bounce">🔥</span>
+                <span>Streak: <span id="streak-count">0</span></span>
+            </div>
+            <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
+                <span>Session Marks: <span id="session-score">+0.0</span></span>
+            </div>
+        </div>
+
+        <!-- Readability & Interactive Tools -->
+        <div class="flex items-center gap-1.5 sm:gap-2">
+            <!-- Text-to-Speech (Read Aloud) -->
+            <button type="button" onclick="toggleReadAloud()" id="speech-btn" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold transition-all flex items-center gap-1.5 hover:scale-105" title="Listen to Question (R)">
+                <i data-lucide="headphones" id="speech-icon" class="w-4 h-4 text-brand-500"></i>
+                <span class="hidden sm:inline" id="speech-text">Listen</span>
+            </button>
+
+            <!-- Font Sizing: Small, Normal, Large -->
+            <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                <button type="button" onclick="changeFontSize('text-sm')" class="font-size-btn px-2 py-1 rounded-lg text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900">A-</button>
+                <button type="button" onclick="changeFontSize('text-base')" class="font-size-btn px-2 py-1 rounded-lg text-xs font-bold bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm">A</button>
+                <button type="button" onclick="changeFontSize('text-lg')" class="font-size-btn px-2 py-1 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900">A+</button>
+            </div>
+
+            <!-- Copy for Notes -->
+            <button type="button" onclick="copyQuestionForNotes()" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold transition-all hover:scale-105" title="Copy Question & Notes to Clipboard">
+                <i data-lucide="copy" class="w-4 h-4 text-purple-500"></i>
+            </button>
+
+            <!-- Keyboard shortcuts info -->
+            <button type="button" onclick="openShortcutsModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" title="View Keyboard Shortcuts">
+                <i data-lucide="help-circle" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+    </div>
+
     <!-- Filters Header -->
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-sm">
         <form method="GET" action="{% url 'quiz:practice' %}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-center">
             
             <!-- Subject Filter -->
             <div>
-                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Subject</label>
-                <select name="subject" onchange="this.form.submit()" class="w-full text-xs font-medium rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 py-2 px-3 focus:ring-2 focus:ring-brand-500">
-                    <option value="">All Subjects</option>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Subject</label>
+                <select name="subject" onchange="this.form.submit()" class="w-full text-xs font-semibold rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 py-2.5 px-3 focus:ring-2 focus:ring-brand-500">
+                    <option value="">All Subjects (500+ Qs)</option>
                     {% for sub in all_subjects %}
                     <option value="{{ sub.slug }}" {% if current_subject and current_subject.slug == sub.slug %}selected{% endif %}>
                         {{ sub.name }} ({{ sub.q_count }})
@@ -24,8 +66,8 @@
 
             <!-- Source Filter -->
             <div>
-                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Test Series</label>
-                <select name="source" onchange="this.form.submit()" class="w-full text-xs font-medium rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 py-2 px-3 focus:ring-2 focus:ring-brand-500">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Test Series</label>
+                <select name="source" onchange="this.form.submit()" class="w-full text-xs font-semibold rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 py-2.5 px-3 focus:ring-2 focus:ring-brand-500">
                     <option value="">All Editions</option>
                     {% for src in all_sources %}
                     <option value="{{ src.slug }}" {% if current_source and current_source.slug == src.slug %}selected{% endif %}>
@@ -37,23 +79,23 @@
 
             <!-- Search Filter -->
             <div>
-                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Search Keywords</label>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Keywords</label>
                 <div class="relative">
-                    <input type="text" name="q" value="{{ query }}" placeholder="e.g. Article 124, NITI..." class="w-full text-xs font-medium rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 py-2 pl-8 pr-3 focus:ring-2 focus:ring-brand-500">
-                    <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+                    <input type="text" name="q" value="{{ query }}" placeholder="Article, Lake, Scheme..." class="w-full text-xs font-medium rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 py-2.5 pl-8 pr-3 focus:ring-2 focus:ring-brand-500">
+                    <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3"></i>
                 </div>
             </div>
 
-            <!-- Actions / Bookmark Filter -->
+            <!-- Bookmark filter -->
             <div class="flex items-end justify-between gap-2 pt-1 sm:pt-0">
-                <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    <input type="checkbox" name="bookmarked" value="1" {% if bookmarked %}checked{% endif %} onchange="this.form.submit()" class="rounded text-brand-600 focus:ring-brand-500">
+                <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700 dark:text-slate-300">
+                    <input type="checkbox" name="bookmarked" value="1" {% if bookmarked %}checked{% endif %} onchange="this.form.submit()" class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4">
                     <span class="flex items-center gap-1">
                         <i data-lucide="bookmark" class="w-3.5 h-3.5 text-rose-500"></i> Saved Only
                     </span>
                 </label>
                 {% if current_subject or current_source or query or bookmarked %}
-                <a href="{% url 'quiz:practice' %}" class="text-xs font-semibold text-rose-500 hover:underline">
+                <a href="{% url 'quiz:practice' %}" class="text-xs font-bold text-rose-500 hover:underline">
                     Clear
                 </a>
                 {% endif %}
@@ -64,115 +106,138 @@
     <!-- Active Filter Summary & Progress Bar -->
     <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
         <div>
-            Showing Question <span class="font-bold text-slate-800 dark:text-slate-200">{{ page_obj.number }}</span> of <span class="font-bold text-slate-800 dark:text-slate-200">{{ total_matched }}</span>
-            {% if current_subject %}in <span class="font-semibold text-brand-600 dark:text-brand-400">{{ current_subject.name }}</span>{% endif %}
-            {% if current_source %}({{ current_source.title }}){% endif %}
+            Question <span class="font-extrabold text-slate-900 dark:text-white">{{ page_obj.number }}</span> of <span class="font-extrabold text-slate-900 dark:text-white">{{ total_matched }}</span>
+            {% if current_subject %}• <span class="font-bold text-brand-600 dark:text-brand-400">{{ current_subject.name }}</span>{% endif %}
         </div>
-        <div>
-            Progress: <span class="font-bold text-emerald-600 dark:text-emerald-400">{{ page_obj.number }}/{{ total_matched }}</span>
+        <div class="flex items-center gap-2">
+            <span class="text-[11px] font-semibold text-slate-400">Shortcut: Press 1-4 or A-D</span>
         </div>
     </div>
 
     {% if page_obj.object_list %}
         {% for q in page_obj.object_list %}
-        <div id="quiz-card" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden" data-correct="{{ q.correct_option }}">
+        <div id="quiz-card" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden animate-fadeInUp transition-all" data-correct="{{ q.correct_option }}">
             
             <!-- Question Card Top Bar -->
-            <div class="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/50">
+            <div class="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-gradient-to-r from-slate-50/80 to-transparent dark:from-slate-900/80">
                 <div class="flex flex-wrap items-center gap-2">
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-extrabold bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                    <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-black bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-sm">
                         Q #{{ q.question_number }}
                     </span>
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold {{ q.subject.badge_color|default:'bg-slate-100 text-slate-800' }}">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-bold {{ q.subject.badge_color|default:'bg-slate-100 text-slate-800' }}">
                         {{ q.subject.name|default:'General Studies' }}
                     </span>
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-medium bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300">
                         {{ q.source.title }}
                     </span>
                 </div>
 
-                <!-- Bookmark Button -->
-                <button type="button" onclick="toggleBookmark({{ q.id }}, this)" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-medium transition-colors {% if q.is_bookmarked %}text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/40{% else %}text-slate-500{% endif %}" title="Bookmark Question">
-                    <i data-lucide="bookmark" class="w-4 h-4 {% if q.is_bookmarked %}fill-current{% endif %}"></i>
+                <!-- Bookmark Button with Heart Animation -->
+                <button type="button" onclick="toggleBookmark({{ q.id }}, this)" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold transition-all hover:scale-105 {% if q.is_bookmarked %}text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/40{% else %}text-slate-500{% endif %}" title="Bookmark Question (Press B)">
+                    <i data-lucide="bookmark" class="w-4 h-4 {% if q.is_bookmarked %}fill-current scale-110{% endif %} transition-transform"></i>
                     <span class="bookmark-text">{% if q.is_bookmarked %}Saved{% else %}Save{% endif %}</span>
                 </button>
             </div>
 
             <!-- Question Stem & Topic -->
-            <div class="p-6 sm:p-8 space-y-4">
+            <div class="p-6 sm:p-8 space-y-5">
+                
                 <!-- Topic Title -->
                 <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">Core Topic</span>
-                    <h3 class="text-xl font-extrabold text-slate-900 dark:text-white mt-0.5">
+                    <span class="text-[10px] font-extrabold uppercase tracking-widest text-brand-600 dark:text-brand-400 block mb-0.5">UPSC Core Topic</span>
+                    <h3 id="question-topic-text" class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                         {{ q.topic }}
                     </h3>
                 </div>
 
-                <!-- Question Text -->
-                <div class="text-slate-800 dark:text-slate-200 text-base leading-relaxed whitespace-pre-line font-medium">
+                <!-- Question Text with dynamic font scaling -->
+                <div id="question-body-text" class="question-text-scalable text-slate-800 dark:text-slate-200 text-base leading-relaxed whitespace-pre-line font-medium transition-all">
                     {{ q.question_text }}
                 </div>
 
-                <!-- 4 Options -->
+                <!-- 4 Options with Elimination / 50:50 Strike-Through Mode -->
                 <div class="mt-6 space-y-3" id="options-group">
+                    
                     <!-- Option A -->
-                    <button type="button" onclick="selectPracticeOption('a', this)" class="option-btn w-full text-left p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all flex items-start gap-3 group" data-opt="a">
-                        <span class="opt-badge flex-shrink-0 w-7 h-7 rounded-lg bg-slate-200 dark:bg-slate-700 group-hover:bg-brand-500 group-hover:text-white text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center transition-colors">
-                            A
-                        </span>
-                        <span class="opt-text text-sm font-medium pt-0.5">{{ q.option_a }}</span>
-                    </button>
+                    <div class="option-container relative group flex items-center">
+                        <button type="button" onclick="selectPracticeOption('a', this)" class="option-btn flex-1 text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-800/30 hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-800 dark:text-slate-200 transition-all flex items-start gap-3 hover:shadow-md" data-opt="a">
+                            <span class="opt-badge flex-shrink-0 w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-black flex items-center justify-center transition-colors">
+                                A
+                            </span>
+                            <span class="opt-text text-sm font-medium pt-1">{{ q.option_a }}</span>
+                        </button>
+                        <!-- Elimination Strike-Through Toggle -->
+                        <button type="button" onclick="toggleEliminate('a', this, event)" title="Eliminate option (Strike-through)" class="eliminate-btn absolute right-3 px-2 py-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition-all opacity-0 group-hover:opacity-100">
+                            ✕ Eliminate
+                        </button>
+                    </div>
 
                     <!-- Option B -->
-                    <button type="button" onclick="selectPracticeOption('b', this)" class="option-btn w-full text-left p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all flex items-start gap-3 group" data-opt="b">
-                        <span class="opt-badge flex-shrink-0 w-7 h-7 rounded-lg bg-slate-200 dark:bg-slate-700 group-hover:bg-brand-500 group-hover:text-white text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center transition-colors">
-                            B
-                        </span>
-                        <span class="opt-text text-sm font-medium pt-0.5">{{ q.option_b }}</span>
-                    </button>
+                    <div class="option-container relative group flex items-center">
+                        <button type="button" onclick="selectPracticeOption('b', this)" class="option-btn flex-1 text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-800/30 hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-800 dark:text-slate-200 transition-all flex items-start gap-3 hover:shadow-md" data-opt="b">
+                            <span class="opt-badge flex-shrink-0 w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-black flex items-center justify-center transition-colors">
+                                B
+                            </span>
+                            <span class="opt-text text-sm font-medium pt-1">{{ q.option_b }}</span>
+                        </button>
+                        <button type="button" onclick="toggleEliminate('b', this, event)" title="Eliminate option (Strike-through)" class="eliminate-btn absolute right-3 px-2 py-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition-all opacity-0 group-hover:opacity-100">
+                            ✕ Eliminate
+                        </button>
+                    </div>
 
                     <!-- Option C -->
-                    <button type="button" onclick="selectPracticeOption('c', this)" class="option-btn w-full text-left p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all flex items-start gap-3 group" data-opt="c">
-                        <span class="opt-badge flex-shrink-0 w-7 h-7 rounded-lg bg-slate-200 dark:bg-slate-700 group-hover:bg-brand-500 group-hover:text-white text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center transition-colors">
-                            C
-                        </span>
-                        <span class="opt-text text-sm font-medium pt-0.5">{{ q.option_c }}</span>
-                    </button>
+                    <div class="option-container relative group flex items-center">
+                        <button type="button" onclick="selectPracticeOption('c', this)" class="option-btn flex-1 text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-800/30 hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-800 dark:text-slate-200 transition-all flex items-start gap-3 hover:shadow-md" data-opt="c">
+                            <span class="opt-badge flex-shrink-0 w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-black flex items-center justify-center transition-colors">
+                                C
+                            </span>
+                            <span class="opt-text text-sm font-medium pt-1">{{ q.option_c }}</span>
+                        </button>
+                        <button type="button" onclick="toggleEliminate('c', this, event)" title="Eliminate option (Strike-through)" class="eliminate-btn absolute right-3 px-2 py-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition-all opacity-0 group-hover:opacity-100">
+                            ✕ Eliminate
+                        </button>
+                    </div>
 
                     <!-- Option D -->
-                    <button type="button" onclick="selectPracticeOption('d', this)" class="option-btn w-full text-left p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-all flex items-start gap-3 group" data-opt="d">
-                        <span class="opt-badge flex-shrink-0 w-7 h-7 rounded-lg bg-slate-200 dark:bg-slate-700 group-hover:bg-brand-500 group-hover:text-white text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center transition-colors">
-                            D
-                        </span>
-                        <span class="opt-text text-sm font-medium pt-0.5">{{ q.option_d }}</span>
-                    </button>
+                    <div class="option-container relative group flex items-center">
+                        <button type="button" onclick="selectPracticeOption('d', this)" class="option-btn flex-1 text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-800/30 hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-800 dark:text-slate-200 transition-all flex items-start gap-3 hover:shadow-md" data-opt="d">
+                            <span class="opt-badge flex-shrink-0 w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-black flex items-center justify-center transition-colors">
+                                D
+                            </span>
+                            <span class="opt-text text-sm font-medium pt-1">{{ q.option_d }}</span>
+                        </button>
+                        <button type="button" onclick="toggleEliminate('d', this, event)" title="Eliminate option (Strike-through)" class="eliminate-btn absolute right-3 px-2 py-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition-all opacity-0 group-hover:opacity-100">
+                            ✕ Eliminate
+                        </button>
+                    </div>
+
                 </div>
 
-                <!-- Explanation Container (Hidden until user clicks an option or toggles) -->
-                <div id="explanation-container" class="hidden mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                <!-- Explanation Container (Animates into view on answering) -->
+                <div id="explanation-container" class="hidden mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 space-y-4 animate-fadeInUp">
                     
                     <!-- Result Status Banner -->
-                    <div id="feedback-banner" class="p-4 rounded-xl flex items-center gap-3">
+                    <div id="feedback-banner" class="p-4 rounded-2xl flex items-center gap-3">
                         <!-- Populated by JS -->
                     </div>
 
                     <!-- Tabs for Explanation, Value Addition, News -->
                     <div class="border-b border-slate-200 dark:border-slate-700">
                         <nav class="flex space-x-4">
-                            <button type="button" onclick="switchExpTab('tab-explanation', this)" class="exp-tab-btn active border-b-2 border-brand-500 pb-2 text-xs font-bold text-brand-600 dark:text-brand-400 flex items-center gap-1.5">
+                            <button type="button" onclick="switchExpTab('tab-explanation', this)" class="exp-tab-btn active border-b-2 border-brand-500 pb-2 text-xs font-extrabold text-brand-600 dark:text-brand-400 flex items-center gap-1.5 transition-all">
                                 <i data-lucide="book-open" class="w-4 h-4"></i>
-                                Detailed Explanation
+                                Statement-by-Statement Proof
                             </button>
                             {% if q.value_addition %}
-                            <button type="button" onclick="switchExpTab('tab-value-addition', this)" class="exp-tab-btn border-b-2 border-transparent pb-2 text-xs font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 flex items-center gap-1.5">
+                            <button type="button" onclick="switchExpTab('tab-value-addition', this)" class="exp-tab-btn border-b-2 border-transparent pb-2 text-xs font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 flex items-center gap-1.5 transition-all">
                                 <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i>
-                                Value Addition / Notes
+                                Value Addition / Nuggets
                             </button>
                             {% endif %}
                             {% if q.in_news %}
-                            <button type="button" onclick="switchExpTab('tab-news', this)" class="exp-tab-btn border-b-2 border-transparent pb-2 text-xs font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 flex items-center gap-1.5">
+                            <button type="button" onclick="switchExpTab('tab-news', this)" class="exp-tab-btn border-b-2 border-transparent pb-2 text-xs font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 flex items-center gap-1.5 transition-all">
                                 <i data-lucide="newspaper" class="w-4 h-4 text-brand-500"></i>
-                                In NEWS
+                                Current Affairs Context
                             </button>
                             {% endif %}
                         </nav>
@@ -180,14 +245,14 @@
 
                     <!-- Tab Contents -->
                     <div id="tab-explanation" class="exp-tab-pane py-2">
-                        <div class="prose dark:prose-invert max-w-none text-sm text-slate-800 dark:text-slate-300 leading-relaxed whitespace-pre-line bg-slate-50 dark:bg-slate-800/40 p-5 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <div id="explanation-raw-text" class="prose dark:prose-invert max-w-none text-sm text-slate-800 dark:text-slate-300 leading-relaxed whitespace-pre-line bg-slate-50/80 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-100 dark:border-slate-800">
                             {{ q.explanation }}
                         </div>
                     </div>
 
                     {% if q.value_addition %}
                     <div id="tab-value-addition" class="exp-tab-pane hidden py-2">
-                        <div class="prose dark:prose-invert max-w-none text-sm text-amber-900 dark:text-amber-200 leading-relaxed whitespace-pre-line bg-amber-50 dark:bg-amber-950/30 p-5 rounded-xl border border-amber-200 dark:border-amber-900/50">
+                        <div class="prose dark:prose-invert max-w-none text-sm text-amber-900 dark:text-amber-200 leading-relaxed whitespace-pre-line bg-amber-50/80 dark:bg-amber-950/30 p-5 rounded-2xl border border-amber-200/80 dark:border-amber-900/50">
                             {{ q.value_addition }}
                         </div>
                     </div>
@@ -195,11 +260,11 @@
 
                     {% if q.in_news %}
                     <div id="tab-news" class="exp-tab-pane hidden py-2">
-                        <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 text-xs font-medium text-blue-900 dark:text-blue-200 flex items-start gap-3">
+                        <div class="p-4 rounded-2xl bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 text-xs font-medium text-blue-900 dark:text-blue-200 flex items-start gap-3">
                             <i data-lucide="info" class="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5"></i>
                             <div>
-                                <span class="font-bold uppercase tracking-wider block text-[10px] text-blue-600 dark:text-blue-400">Current Affairs Trigger</span>
-                                <p class="text-sm mt-0.5">{{ q.in_news }}</p>
+                                <span class="font-extrabold uppercase tracking-wider block text-[10px] text-blue-600 dark:text-blue-400">In The News</span>
+                                <p class="text-sm mt-0.5 font-semibold">{{ q.in_news }}</p>
                             </div>
                         </div>
                     </div>
@@ -207,37 +272,37 @@
                 </div>
             </div>
 
-            <!-- Card Bottom Navigation -->
-            <div class="p-4 sm:p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80 flex items-center justify-between">
+            <!-- Card Bottom Navigation Controls -->
+            <div class="p-4 sm:p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/80 flex items-center justify-between">
                 <div>
                     {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}{% if current_subject %}&subject={{ current_subject.slug }}{% endif %}{% if current_source %}&source={{ current_source.slug }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if bookmarked %}&bookmarked=1{% endif %}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors shadow-sm">
+                    <a id="btn-prev-q" href="?page={{ page_obj.previous_page_number }}{% if current_subject %}&subject={{ current_subject.slug }}{% endif %}{% if current_source %}&source={{ current_source.slug }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if bookmarked %}&bookmarked=1{% endif %}" class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 transition-all shadow-sm hover:scale-105" title="Previous Question (P or ←)">
                         <i data-lucide="chevron-left" class="w-4 h-4"></i>
-                        Previous
+                        Previous (P)
                     </a>
                     {% else %}
-                    <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800/40 text-xs font-semibold text-slate-400 cursor-not-allowed">
+                    <span class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800/40 text-xs font-semibold text-slate-400 cursor-not-allowed">
                         <i data-lucide="chevron-left" class="w-4 h-4"></i>
-                        Previous
+                        Start
                     </span>
                     {% endif %}
                 </div>
 
                 <!-- Show/Hide Explanation toggle button -->
-                <button type="button" onclick="toggleExplanationManually()" id="toggle-exp-btn" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 transition-colors">
+                <button type="button" onclick="toggleExplanationManually()" id="toggle-exp-btn" class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs font-black text-slate-800 dark:text-slate-200 transition-all hover:scale-105" title="Toggle Explanation (E)">
                     <i data-lucide="eye" class="w-4 h-4"></i>
-                    <span>Show Explanation</span>
+                    <span>Show Proof (E)</span>
                 </button>
 
                 <div>
                     {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}{% if current_subject %}&subject={{ current_subject.slug }}{% endif %}{% if current_source %}&source={{ current_source.slug }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if bookmarked %}&bookmarked=1{% endif %}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold transition-colors shadow-sm">
-                        Next
+                    <a id="btn-next-q" href="?page={{ page_obj.next_page_number }}{% if current_subject %}&subject={{ current_subject.slug }}{% endif %}{% if current_source %}&source={{ current_source.slug }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if bookmarked %}&bookmarked=1{% endif %}" class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-black transition-all shadow-md shadow-brand-600/25 hover:scale-105" title="Next Question (N or →)">
+                        Next (N)
                         <i data-lucide="chevron-right" class="w-4 h-4"></i>
                     </a>
                     {% else %}
-                    <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800/40 text-xs font-semibold text-slate-400 cursor-not-allowed">
-                        End of Series
+                    <span class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
+                        🎉 Series Completed!
                     </span>
                     {% endif %}
                 </div>
@@ -246,11 +311,11 @@
         </div>
         {% endfor %}
     {% else %}
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center">
             <i data-lucide="search-x" class="w-12 h-12 text-slate-400 mx-auto mb-3"></i>
             <h3 class="text-base font-bold text-slate-900 dark:text-white">No questions found matching criteria</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Try resetting filters or searching for different keywords.</p>
-            <a href="{% url 'quiz:practice' %}" class="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-xl bg-brand-600 text-white text-xs font-semibold">
+            <a href="{% url 'quiz:practice' %}" class="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-xl bg-brand-600 text-white text-xs font-bold">
                 Reset Filters
             </a>
         </div>
@@ -262,6 +327,21 @@
 {% block extra_js %}
 <script>
     let answered = false;
+    let isSpeaking = false;
+    let speechUtterance = null;
+
+    // Load Streak & Score from sessionStorage
+    let sessionStreak = parseInt(sessionStorage.getItem('pyq_streak') || '0', 10);
+    let sessionScore = parseFloat(sessionStorage.getItem('pyq_session_score') || '0.0');
+    updateSessionUI();
+
+    function updateSessionUI() {
+        document.getElementById('streak-count').innerText = sessionStreak;
+        document.getElementById('session-score').innerText = (sessionScore >= 0 ? '+' : '') + sessionScore.toFixed(2);
+        if (sessionStreak >= 3) {
+            document.getElementById('streak-pill').className = 'flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-black shadow-md shadow-orange-500/20 scale-105 transition-all';
+        }
+    }
 
     function selectPracticeOption(chosenOpt, btn) {
         if (answered) return;
@@ -271,56 +351,93 @@
         const correctOpt = card.dataset.correct.toLowerCase();
         chosenOpt = chosenOpt.toLowerCase();
 
-        const allButtons = document.querySelectorAll('.option-btn');
-        allButtons.forEach(b => {
+        const allContainers = document.querySelectorAll('.option-container');
+        allContainers.forEach(container => {
+            const b = container.querySelector('.option-btn');
             const opt = b.dataset.opt.toLowerCase();
             if (opt === correctOpt) {
-                // Highlight correct in emerald
-                b.className = 'option-btn w-full text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-100 shadow-sm flex items-start gap-3 transition-all';
-                b.querySelector('.opt-badge').className = 'opt-badge flex-shrink-0 w-7 h-7 rounded-lg bg-emerald-500 text-white text-xs font-bold flex items-center justify-center';
+                // Highlight correct option in emerald
+                b.className = 'option-btn flex-1 text-left p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-100 shadow-lg shadow-emerald-500/10 flex items-start gap-3 transition-all scale-[1.01]';
+                b.querySelector('.opt-badge').className = 'opt-badge flex-shrink-0 w-8 h-8 rounded-xl bg-emerald-500 text-white text-xs font-black flex items-center justify-center';
             } else if (opt === chosenOpt && chosenOpt !== correctOpt) {
                 // Highlight user wrong choice in rose
-                b.className = 'option-btn w-full text-left p-4 rounded-xl border-2 border-rose-500 bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-100 shadow-sm flex items-start gap-3 transition-all';
-                b.querySelector('.opt-badge').className = 'opt-badge flex-shrink-0 w-7 h-7 rounded-lg bg-rose-500 text-white text-xs font-bold flex items-center justify-center';
+                b.className = 'option-btn flex-1 text-left p-4 rounded-2xl border-2 border-rose-500 bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-100 shadow-lg shadow-rose-500/10 flex items-start gap-3 transition-all';
+                b.querySelector('.opt-badge').className = 'opt-badge flex-shrink-0 w-8 h-8 rounded-xl bg-rose-500 text-white text-xs font-black flex items-center justify-center';
             } else {
-                b.classList.add('opacity-50');
+                b.classList.add('opacity-40');
             }
         });
 
-        // Set feedback banner
         const expContainer = document.getElementById('explanation-container');
         const banner = document.getElementById('feedback-banner');
         const toggleBtn = document.getElementById('toggle-exp-btn');
 
         if (chosenOpt === correctOpt) {
-            banner.className = 'p-4 rounded-xl flex items-center gap-3 bg-emerald-100 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200';
+            // Correct answer Audio & Confetti
+            AudioFX.correct();
+            sessionStreak++;
+            sessionScore += 2.0;
+
+            if (sessionStreak % 3 === 0) {
+                AudioFX.celebrate();
+            }
+
+            banner.className = 'p-4 rounded-2xl flex items-center gap-3 bg-gradient-to-r from-emerald-100 to-teal-50 dark:from-emerald-950/60 dark:to-teal-950/30 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 animate-popIn';
             banner.innerHTML = `
-                <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">✓</div>
+                <div class="w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center font-black text-lg flex-shrink-0 shadow-md">✓</div>
                 <div>
-                    <h4 class="font-extrabold text-sm">Correct Answer! (+2.0 Marks)</h4>
-                    <p class="text-xs">Option (${correctOpt.toUpperCase()}) is the right answer.</p>
+                    <h4 class="font-black text-sm">Correct Answer! (+2.0 Marks)</h4>
+                    <p class="text-xs">Option (${correctOpt.toUpperCase()}) is the right answer. Well done!</p>
                 </div>
             `;
         } else {
-            banner.className = 'p-4 rounded-xl flex items-center gap-3 bg-rose-100 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200';
+            // Wrong answer Audio
+            AudioFX.wrong();
+            sessionStreak = 0;
+            sessionScore -= 0.66;
+
+            banner.className = 'p-4 rounded-2xl flex items-center gap-3 bg-gradient-to-r from-rose-100 to-orange-50 dark:from-rose-950/60 dark:to-orange-950/30 border border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200 animate-popIn';
             banner.innerHTML = `
-                <div class="w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center font-bold">✕</div>
+                <div class="w-10 h-10 rounded-2xl bg-rose-500 text-white flex items-center justify-center font-black text-lg flex-shrink-0 shadow-md">✕</div>
                 <div>
-                    <h4 class="font-extrabold text-sm">Incorrect Answer (-0.66 Marks)</h4>
+                    <h4 class="font-black text-sm">Incorrect Choice (-0.66 Marks)</h4>
                     <p class="text-xs">You chose (${chosenOpt.toUpperCase()}). The correct answer is <strong>Option (${correctOpt.toUpperCase()})</strong>.</p>
                 </div>
             `;
         }
 
-        // Auto-reveal explanation
+        sessionStorage.setItem('pyq_streak', sessionStreak);
+        sessionStorage.setItem('pyq_session_score', sessionScore);
+        updateSessionUI();
+
+        // Auto reveal explanation
         expContainer.classList.remove('hidden');
         if (toggleBtn) {
-            toggleBtn.querySelector('span').innerText = 'Hide Explanation';
+            toggleBtn.querySelector('span').innerText = 'Hide Proof (E)';
         }
         lucide.createIcons();
     }
 
+    // Interactive Option Elimination / 50-50 Strike-Through Mode
+    function toggleEliminate(optKey, btn, event) {
+        event.stopPropagation();
+        AudioFX.click();
+        const container = btn.closest('.option-container');
+        const optBtn = container.querySelector('.option-btn');
+        const isEliminated = optBtn.classList.toggle('eliminated-opt');
+
+        if (isEliminated) {
+            btn.innerHTML = '↩ Restore';
+            btn.className = 'eliminate-btn absolute right-3 px-2 py-1 rounded-lg text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/50 text-xs font-bold transition-all opacity-100';
+            showToast(`Option (${optKey.toUpperCase()}) eliminated ✕`);
+        } else {
+            btn.innerHTML = '✕ Eliminate';
+            btn.className = 'eliminate-btn absolute right-3 px-2 py-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition-all opacity-0 group-hover:opacity-100';
+        }
+    }
+
     function toggleExplanationManually() {
+        AudioFX.click();
         const expContainer = document.getElementById('explanation-container');
         const toggleBtn = document.getElementById('toggle-exp-btn');
         const card = document.getElementById('quiz-card');
@@ -328,36 +445,100 @@
 
         if (expContainer.classList.contains('hidden')) {
             expContainer.classList.remove('hidden');
-            toggleBtn.querySelector('span').innerText = 'Hide Explanation';
+            toggleBtn.querySelector('span').innerText = 'Hide Proof (E)';
             
-            // Highlight the correct answer if not yet answered
             if (!answered) {
                 const correctBtn = document.querySelector(`.option-btn[data-opt="${correctOpt}"]`);
                 if (correctBtn) {
-                    correctBtn.className = 'option-btn w-full text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-100 shadow-sm flex items-start gap-3 transition-all';
-                    correctBtn.querySelector('.opt-badge').className = 'opt-badge flex-shrink-0 w-7 h-7 rounded-lg bg-emerald-500 text-white text-xs font-bold flex items-center justify-center';
+                    correctBtn.className = 'option-btn flex-1 text-left p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-100 shadow-md flex items-start gap-3 transition-all';
+                    correctBtn.querySelector('.opt-badge').className = 'opt-badge flex-shrink-0 w-8 h-8 rounded-xl bg-emerald-500 text-white text-xs font-black flex items-center justify-center';
                 }
             }
         } else {
             expContainer.classList.add('hidden');
-            toggleBtn.querySelector('span').innerText = 'Show Explanation';
+            toggleBtn.querySelector('span').innerText = 'Show Proof (E)';
         }
         lucide.createIcons();
     }
 
     function switchExpTab(tabId, btn) {
+        AudioFX.click();
         document.querySelectorAll('.exp-tab-pane').forEach(p => p.classList.add('hidden'));
         document.getElementById(tabId).classList.remove('hidden');
 
         document.querySelectorAll('.exp-tab-btn').forEach(b => {
-            b.className = 'exp-tab-btn border-b-2 border-transparent pb-2 text-xs font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 flex items-center gap-1.5';
+            b.className = 'exp-tab-btn border-b-2 border-transparent pb-2 text-xs font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 flex items-center gap-1.5 transition-all';
         });
 
-        btn.className = 'exp-tab-btn active border-b-2 border-brand-500 pb-2 text-xs font-bold text-brand-600 dark:text-brand-400 flex items-center gap-1.5';
+        btn.className = 'exp-tab-btn active border-b-2 border-brand-500 pb-2 text-xs font-extrabold text-brand-600 dark:text-brand-400 flex items-center gap-1.5 transition-all';
         lucide.createIcons();
     }
 
+    // Font Sizing logic
+    function changeFontSize(sizeClass) {
+        AudioFX.click();
+        const bodyText = document.getElementById('question-body-text');
+        bodyText.className = `question-text-scalable text-slate-800 dark:text-slate-200 ${sizeClass} leading-relaxed whitespace-pre-line font-medium transition-all`;
+        
+        document.querySelectorAll('.font-size-btn').forEach(b => {
+            b.classList.remove('bg-white', 'dark:bg-slate-700', 'text-brand-600', 'dark:text-brand-400', 'shadow-sm');
+            b.classList.add('text-slate-600', 'dark:text-slate-400');
+        });
+        event.target.classList.add('bg-white', 'dark:bg-slate-700', 'text-brand-600', 'dark:text-brand-400', 'shadow-sm');
+        event.target.classList.remove('text-slate-600', 'dark:text-slate-400');
+    }
+
+    // Text to Speech (Read Aloud Hands-free)
+    function toggleReadAloud() {
+        if (!('speechSynthesis' in window)) {
+            showToast('Speech synthesis not supported in this browser.');
+            return;
+        }
+
+        if (isSpeaking) {
+            window.speechSynthesis.cancel();
+            isSpeaking = false;
+            document.getElementById('speech-text').innerText = 'Listen';
+            document.getElementById('speech-btn').classList.remove('bg-brand-50', 'border-brand-500');
+            showToast('Stopped reading.');
+        } else {
+            const topic = document.getElementById('question-topic-text').innerText;
+            const body = document.getElementById('question-body-text').innerText;
+            const fullText = `Topic: ${topic}. Question: ${body}`;
+
+            speechUtterance = new SpeechSynthesisUtterance(fullText);
+            speechUtterance.rate = 1.0;
+            speechUtterance.onend = () => {
+                isSpeaking = false;
+                document.getElementById('speech-text').innerText = 'Listen';
+                document.getElementById('speech-btn').classList.remove('bg-brand-50', 'border-brand-500');
+            };
+
+            window.speechSynthesis.speak(speechUtterance);
+            isSpeaking = true;
+            document.getElementById('speech-text').innerText = 'Stop';
+            document.getElementById('speech-btn').classList.add('bg-brand-50', 'border-brand-500');
+            showToast('Reading question aloud 🎧');
+        }
+    }
+
+    // Copy Question & Notes formatted as Markdown to clipboard
+    function copyQuestionForNotes() {
+        AudioFX.click();
+        const topic = document.getElementById('question-topic-text').innerText;
+        const text = document.getElementById('question-body-text').innerText;
+        const card = document.getElementById('quiz-card');
+        const correctOpt = card.dataset.correct.toUpperCase();
+        const exp = document.getElementById('explanation-raw-text') ? document.getElementById('explanation-raw-text').innerText : '';
+
+        const formatted = `### UPSC Question: ${topic}\n\n${text}\n\n**Correct Answer:** Option (${correctOpt})\n\n**Explanation:**\n${exp}\n`;
+        navigator.clipboard.writeText(formatted).then(() => {
+            showToast('📋 Copied formatted notes to clipboard!');
+        });
+    }
+
     function toggleBookmark(qId, btn) {
+        AudioFX.click();
         fetch(`/api/bookmark/${qId}/`, {
             method: 'POST',
             headers: {
@@ -368,19 +549,53 @@
         .then(res => res.json())
         .then(data => {
             if (data.status === 'ok') {
-                const icon = btn.querySelector('svg');
                 const text = btn.querySelector('.bookmark-text');
                 if (data.is_bookmarked) {
-                    btn.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-300 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-medium transition-colors';
+                    btn.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-300 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-bold transition-all scale-105';
                     text.innerText = 'Saved';
+                    showToast('Question saved to bookmarks! ❤️');
                 } else {
-                    btn.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 text-xs font-medium transition-colors';
+                    btn.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 text-xs font-bold transition-all';
                     text.innerText = 'Save';
+                    showToast('Removed from bookmarks.');
                 }
                 lucide.createIcons();
             }
         });
     }
+
+    // Global Keyboard Shortcuts (A/B/C/D, N, P, E, B, R)
+    window.addEventListener('keydown', (e) => {
+        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+        const key = e.key.toLowerCase();
+
+        if (['1', 'a'].includes(key)) {
+            const btn = document.querySelector('.option-btn[data-opt="a"]');
+            if (btn && !answered) selectPracticeOption('a', btn);
+        } else if (['2', 'b'].includes(key)) {
+            const btn = document.querySelector('.option-btn[data-opt="b"]');
+            if (btn && !answered) selectPracticeOption('b', btn);
+        } else if (['3', 'c'].includes(key)) {
+            const btn = document.querySelector('.option-btn[data-opt="c"]');
+            if (btn && !answered) selectPracticeOption('c', btn);
+        } else if (['4', 'd'].includes(key)) {
+            const btn = document.querySelector('.option-btn[data-opt="d"]');
+            if (btn && !answered) selectPracticeOption('d', btn);
+        } else if (key === 'n' || e.key === 'ArrowRight') {
+            const nextBtn = document.getElementById('btn-next-q');
+            if (nextBtn) nextBtn.click();
+        } else if (key === 'p' || e.key === 'ArrowLeft') {
+            const prevBtn = document.getElementById('btn-prev-q');
+            if (prevBtn) prevBtn.click();
+        } else if (key === 'e') {
+            toggleExplanationManually();
+        } else if (key === 'b') {
+            const bBtn = document.querySelector('button[title*="Bookmark"]');
+            if (bBtn) bBtn.click();
+        } else if (key === 'r') {
+            toggleReadAloud();
+        }
+    });
 
     function getCookie(name) {
         let cookieValue = null;
