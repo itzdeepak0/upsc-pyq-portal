@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}UPSC Prelims PYQ Portal{% endblock %} | KingMakers IAS Series</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            200: '#bae0fd',
+                            300: '#7cc7fb',
+                            400: '#36abf7',
+                            500: '#0c8fe9',
+                            600: '#0271c7',
+                            700: '#035aa1',
+                            800: '#074c85',
+                            900: '#0c406e',
+                            950: '#082949',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        pre, code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand / Logo -->
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'quiz:home' %}" class="flex items-center space-x-2.5 group">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-700 to-brand-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform">
+                            <i data-lucide="award" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <span class="text-lg font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5">
+                                UPSC <span class="text-brand-600 dark:text-brand-400">PYQ Portal</span>
+                            </span>
+                            <span class="block text-[11px] text-slate-500 dark:text-slate-400 font-medium tracking-wide">
+                                Monthly Test Series & Question Bank
+                            </span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Desktop Nav Links -->
+                <nav class="hidden md:flex items-center space-x-1 lg:space-x-1.5">
+                    <a href="{% url 'quiz:home' %}" class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors flex items-center gap-2">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-500"></i>
+                        Dashboard
+                    </a>
+                    <a href="{% url 'quiz:practice' %}" class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors flex items-center gap-2">
+                        <i data-lucide="play-circle" class="w-4 h-4 text-emerald-500"></i>
+                        Practice Mode
+                    </a>
+                    <a href="{% url 'quiz:exam_setup' %}" class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors flex items-center gap-2">
+                        <i data-lucide="timer" class="w-4 h-4 text-amber-500"></i>
+                        Mock Exam
+                    </a>
+                    <a href="{% url 'quiz:editions' %}" class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors flex items-center gap-2">
+                        <i data-lucide="layers" class="w-4 h-4 text-indigo-500"></i>
+                        Monthly Editions
+                    </a>
+                    <a href="{% url 'quiz:explorer' %}" class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors flex items-center gap-2">
+                        <i data-lucide="search" class="w-4 h-4 text-brand-500"></i>
+                        Question Bank
+                    </a>
+                    <a href="{% url 'quiz:upload_pdf' %}" class="px-3 py-2 rounded-lg text-sm font-bold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 hover:bg-purple-100 transition-colors flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-4 h-4 text-purple-600 dark:text-purple-400"></i>
+                        Add Month PDF
+                    </a>
+                </nav>
+
+                <!-- Right Controls: Bookmarks, Theme Toggle, Admin -->
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'quiz:practice' %}?bookmarked=1" title="Saved Questions" class="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative">
+                        <i data-lucide="bookmark" class="w-5 h-5 text-rose-500"></i>
+                    </a>
+
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" type="button" class="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="Toggle Theme">
+                        <i data-lucide="moon" id="theme-moon" class="w-5 h-5 hidden"></i>
+                        <i data-lucide="sun" id="theme-sun" class="w-5 h-5 hidden"></i>
+                    </button>
+
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Nav Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 px-4 pt-2 pb-4 space-y-1 bg-white dark:bg-slate-900">
+            <a href="{% url 'quiz:home' %}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+                Dashboard
+            </a>
+            <a href="{% url 'quiz:practice' %}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+                Practice Mode
+            </a>
+            <a href="{% url 'quiz:exam_setup' %}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+                Timed Mock Exam
+            </a>
+            <a href="{% url 'quiz:editions' %}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+                Monthly Editions
+            </a>
+            <a href="{% url 'quiz:explorer' %}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+                Question Bank
+            </a>
+            <a href="{% url 'quiz:upload_pdf' %}" class="block px-3 py-2 rounded-lg text-base font-bold text-purple-600 dark:text-purple-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+                + Add Month PDF
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-6 text-center text-xs text-slate-500 dark:text-slate-400 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div>
+                © 2026 UPSC Prelims Interactive Test Portal • Python, Django & SQLite Stack
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                    SQLite3 Database Active
+                </span>
+                <a href="/admin/" class="hover:underline text-brand-600 dark:text-brand-400">Admin Panel</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Theme and Icon scripts -->
+    <script>
+        lucide.createIcons();
+
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeMoon = document.getElementById('theme-moon');
+        const themeSun = document.getElementById('theme-sun');
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            themeSun.classList.remove('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            themeMoon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', function() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+                themeSun.classList.add('hidden');
+                themeMoon.classList.remove('hidden');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+                themeMoon.classList.add('hidden');
+                themeSun.classList.remove('hidden');
+            }
+            lucide.createIcons();
+        });
+
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileBtn && mobileMenu) {
+            mobileBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

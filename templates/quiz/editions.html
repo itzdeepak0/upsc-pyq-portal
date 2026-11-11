@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Editions & Months - UPSC Prelims PYQ Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="layers" class="w-6 h-6 text-brand-500"></i>
+                Test Series Editions & Monthly Archives
+            </h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Manage all imported monthly editions in your SQLite database.
+            </p>
+        </div>
+
+        <a href="{% url 'quiz:upload_pdf' %}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-md shadow-brand-600/20 transition-all">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            Import Upcoming Month PDF
+        </a>
+    </div>
+
+    <!-- Editions Cards Grid -->
+    <div class="space-y-4">
+        {% for s in sources %}
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-brand-100 dark:bg-brand-950 text-brand-800 dark:text-brand-300">
+                        Monthly Test Series
+                    </span>
+                    <span class="text-xs text-slate-400">
+                        Added {{ s.created_at|date:"M d, Y" }}
+                    </span>
+                </div>
+                <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">
+                    {{ s.title }}
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                    Contains <strong class="text-slate-800 dark:text-slate-200">{{ s.total_questions }}</strong> verified Prelims questions with detailed explanations and notes.
+                </p>
+            </div>
+
+            <!-- Actions Bar -->
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="{% url 'quiz:practice' %}?source={{ s.slug }}" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors flex items-center gap-1.5">
+                    <i data-lucide="play" class="w-3.5 h-3.5 text-emerald-500"></i> Practice
+                </a>
+
+                <form method="POST" action="{% url 'quiz:exam_setup' %}" class="inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="source_id" value="{{ s.id }}">
+                    <input type="hidden" name="num_questions" value="{{ s.total_questions }}">
+                    <input type="hidden" name="duration" value="120">
+                    <button type="submit" class="px-3 py-2 rounded-xl bg-brand-50 dark:bg-brand-950/40 hover:bg-brand-100 text-brand-600 dark:text-brand-400 text-xs font-bold transition-colors flex items-center gap-1.5">
+                        <i data-lucide="timer" class="w-3.5 h-3.5"></i> Mock Test
+                    </button>
+                </form>
+
+                <a href="{% url 'quiz:export_edition_json' s.slug %}" class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-semibold transition-colors flex items-center gap-1.5" title="Export as JSON">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i> JSON
+                </a>
+
+                <form method="POST" action="{% url 'quiz:delete_edition' s.slug %}" onsubmit="return confirm('Are you sure you want to delete {{ s.title }} and its questions?');" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="Delete Edition">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% empty %}
+        <div class="p-12 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
+            <i data-lucide="folder-x" class="w-12 h-12 text-slate-400 mx-auto mb-2"></i>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">No editions currently loaded</h3>
+            <a href="{% url 'quiz:upload_pdf' %}" class="inline-block mt-3 px-4 py-2 rounded-xl bg-brand-600 text-white text-xs font-bold">
+                Import Your First Month PDF
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

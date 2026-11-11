@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Question Bank Explorer - UPSC Prelims PYQ Portal{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Explorer Header & Search Form -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+        <div class="mb-4">
+            <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="search" class="w-6 h-6 text-brand-500"></i>
+                UPSC Prelims Question Bank
+            </h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Explore, search, and filter all 500+ questions stored in the SQLite database.
+            </p>
+        </div>
+
+        <form method="GET" action="{% url 'quiz:explorer' %}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
+            <!-- Keyword search -->
+            <div class="sm:col-span-2">
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Search Keywords</label>
+                <div class="relative">
+                    <input type="text" name="q" value="{{ query }}" placeholder="Search by topic, article, concept, or term..." class="w-full text-xs font-medium rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white py-2.5 pl-9 pr-3 focus:ring-2 focus:ring-brand-500">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+                </div>
+            </div>
+
+            <!-- Subject -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Subject</label>
+                <select name="subject" class="w-full text-xs font-medium rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white py-2.5 px-3 focus:ring-2 focus:ring-brand-500">
+                    <option value="">All Subjects</option>
+                    {% for sub in all_subjects %}
+                    <option value="{{ sub.slug }}" {% if selected_subject == sub.slug %}selected{% endif %}>{{ sub.name }} ({{ sub.q_count }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Source -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Test Series</label>
+                <select name="source" class="w-full text-xs font-medium rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white py-2.5 px-3 focus:ring-2 focus:ring-brand-500">
+                    <option value="">All Editions</option>
+                    {% for src in all_sources %}
+                    <option value="{{ src.slug }}" {% if selected_source == src.slug %}selected{% endif %}>{{ src.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="sm:col-span-2 lg:col-span-4 flex items-center justify-between pt-2">
+                <span class="text-xs text-slate-500 dark:text-slate-400">
+                    Found <strong class="text-slate-900 dark:text-white">{{ total_matched }}</strong> questions matching query
+                </span>
+                <div class="flex items-center gap-2">
+                    {% if query or selected_subject or selected_source %}
+                    <a href="{% url 'quiz:explorer' %}" class="px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-rose-500">
+                        Clear Filters
+                    </a>
+                    {% endif %}
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-sm transition-colors flex items-center gap-1.5">
+                        <i data-lucide="filter" class="w-3.5 h-3.5"></i> Apply Filters
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Questions List Table / Cards -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
+        <div class="divide-y divide-slate-100 dark:divide-slate-800">
+            {% for q in page_obj.object_list %}
+            <div class="p-5 hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="space-y-1.5 flex-1">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2 py-0.5 rounded text-[11px] font-black bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                            #{{ q.question_number }}
+                        </span>
+                        <span class="px-2 py-0.5 rounded text-[11px] font-semibold {{ q.subject.badge_color|default:'bg-slate-100 text-slate-800' }}">
+                            {{ q.subject.name|default:'General Studies' }}
+                        </span>
+                        <span class="text-[11px] text-slate-400">
+                            {{ q.source.title }}
+                        </span>
+                    </div>
+
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">
+                        {{ q.topic }}
+                    </h3>
+
+                    <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                        {{ q.question_text }}
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <a href="{% url 'quiz:practice' %}?q={{ q.topic|urlencode }}" class="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-brand-950/40 text-brand-600 dark:text-brand-400 text-xs font-bold transition-colors flex items-center gap-1.5">
+                        <i data-lucide="play" class="w-3.5 h-3.5"></i> Practice
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="p-12 text-center text-slate-400 text-xs">
+                No questions found. Try refining your search query.
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80 flex items-center justify-between text-xs">
+            <div>
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </div>
+            <div class="flex items-center gap-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_subject %}&subject={{ selected_subject }}{% endif %}{% if selected_source %}&source={{ selected_source }}{% endif %}" class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold">
+                    Previous
+                </a>
+                {% endif %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_subject %}&subject={{ selected_subject }}{% endif %}{% if selected_source %}&source={{ selected_source }}{% endif %}" class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold">
+                    Next
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

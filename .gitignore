@@ -1,0 +1,22 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Static files cache (staticfiles will be generated during build)
+staticfiles/
+
+# IDE / OS files
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

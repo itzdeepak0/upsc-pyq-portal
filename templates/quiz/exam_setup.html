@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Setup Mock Exam - UPSC Prelims PYQ Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm">
+        
+        <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 mb-2">
+                <i data-lucide="timer" class="w-3.5 h-3.5"></i>
+                UPSC Prelims Simulation
+            </span>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+                Configure Your Mock Test
+            </h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Customize your timed exam with standard UPSC negative marking (+2.0 / -0.66).
+            </p>
+        </div>
+
+        <form method="POST" action="{% url 'quiz:exam_setup' %}" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Choose Test Series -->
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
+                    1. Select Test Series Source
+                </label>
+                <select name="source_id" class="w-full text-sm font-medium rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-brand-500">
+                    <option value="">All Sources Combined (500+ Questions)</option>
+                    {% for src in sources %}
+                    <option value="{{ src.id }}">{{ src.title }} ({{ src.total_questions }} Questions)</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Choose Subject -->
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
+                    2. Select Subject (Optional)
+                </label>
+                <select name="subject_id" class="w-full text-sm font-medium rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-brand-500">
+                    <option value="">Full Syllabus (All Subjects)</option>
+                    {% for sub in subjects %}
+                    <option value="{{ sub.id }}">{{ sub.name }} ({{ sub.q_count }} Questions)</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Number of Questions -->
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
+                    3. Number of Questions
+                </label>
+                <div class="grid grid-cols-4 gap-3">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="num_questions" value="25" class="peer sr-only">
+                        <div class="text-center py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 peer-checked:border-brand-500 peer-checked:bg-brand-50 dark:peer-checked:bg-brand-950/40 peer-checked:text-brand-600 dark:peer-checked:text-brand-400 font-bold text-sm transition-all">
+                            25 Qs
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="num_questions" value="50" checked class="peer sr-only">
+                        <div class="text-center py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 peer-checked:border-brand-500 peer-checked:bg-brand-50 dark:peer-checked:bg-brand-950/40 peer-checked:text-brand-600 dark:peer-checked:text-brand-400 font-bold text-sm transition-all">
+                            50 Qs
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="num_questions" value="100" class="peer sr-only">
+                        <div class="text-center py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 peer-checked:border-brand-500 peer-checked:bg-brand-50 dark:peer-checked:bg-brand-950/40 peer-checked:text-brand-600 dark:peer-checked:text-brand-400 font-bold text-sm transition-all">
+                            100 Qs
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="num_questions" value="200" class="peer sr-only">
+                        <div class="text-center py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 peer-checked:border-brand-500 peer-checked:bg-brand-50 dark:peer-checked:bg-brand-950/40 peer-checked:text-brand-600 dark:peer-checked:text-brand-400 font-bold text-sm transition-all">
+                            200 Qs
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Duration -->
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
+                    4. Exam Duration
+                </label>
+                <div class="grid grid-cols-3 gap-3">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="duration" value="30" class="peer sr-only">
+                        <div class="text-center py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 peer-checked:border-brand-500 peer-checked:bg-brand-50 dark:peer-checked:bg-brand-950/40 peer-checked:text-brand-600 dark:peer-checked:text-brand-400 font-bold text-sm transition-all">
+                            30 Mins
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="duration" value="60" checked class="peer sr-only">
+                        <div class="text-center py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 peer-checked:border-brand-500 peer-checked:bg-brand-50 dark:peer-checked:bg-brand-950/40 peer-checked:text-brand-600 dark:peer-checked:text-brand-400 font-bold text-sm transition-all">
+                            60 Mins
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="duration" value="120" class="peer sr-only">
+                        <div class="text-center py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 peer-checked:border-brand-500 peer-checked:bg-brand-50 dark:peer-checked:bg-brand-950/40 peer-checked:text-brand-600 dark:peer-checked:text-brand-400 font-bold text-sm transition-all">
+                            120 Mins (UPSC Standard)
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Randomize -->
+            <div class="pt-2">
+                <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    <input type="checkbox" name="randomize" value="1" checked class="rounded text-brand-600 focus:ring-brand-500">
+                    <span>Shuffle questions randomly</span>
+                </label>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-4">
+                <button type="submit" class="w-full py-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-base shadow-lg shadow-brand-600/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
+                    <i data-lucide="play" class="w-5 h-5"></i>
+                    Start Timed Mock Exam
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endblock %}
