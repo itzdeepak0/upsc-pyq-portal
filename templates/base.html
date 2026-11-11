@@ -85,6 +85,253 @@
             border-style: dashed !important;
             pointer-events: auto !important;
         }
+
+        /* ─────────────────────────────────────────
+           Explanation Renderer – Structured Layout
+        ───────────────────────────────────────── */
+        .exp-wrap {
+            font-size: 0.82rem;
+            line-height: 1.65;
+            color: #334155;
+        }
+        .dark .exp-wrap { color: #cbd5e1; }
+
+        /* Plain paragraph */
+        .exp-para {
+            margin-bottom: 0.6rem;
+            text-align: justify;
+            color: #475569;
+        }
+        .dark .exp-para { color: #94a3b8; }
+
+        /* ── Numbered Statement card ── */
+        .exp-statement {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            margin-bottom: 0.85rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #0c8fe9;
+            border-radius: 0.9rem;
+            padding: 0.75rem 1rem;
+            transition: box-shadow 0.2s;
+        }
+        .dark .exp-statement {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-color: #334155;
+            border-left-color: #36abf7;
+        }
+        .exp-statement:hover { box-shadow: 0 4px 16px rgba(12,143,233,0.10); }
+        .exp-stmt-num {
+            flex-shrink: 0;
+            width: 1.75rem;
+            height: 1.75rem;
+            border-radius: 50%;
+            background: #0c8fe9;
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0.1rem;
+        }
+        .dark .exp-stmt-num { background: #0271c7; }
+        .exp-stmt-content { flex: 1; min-width: 0; }
+        .exp-stmt-heading {
+            font-weight: 700;
+            font-size: 0.83rem;
+            color: #1e293b;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .dark .exp-stmt-heading { color: #e2e8f0; }
+        .exp-stmt-body {
+            color: #64748b;
+            font-size: 0.8rem;
+            text-align: justify;
+            margin-bottom: 0.2rem;
+        }
+        .dark .exp-stmt-body { color: #94a3b8; }
+
+        /* ── Option Analysis card ── */
+        .exp-option {
+            display: flex;
+            gap: 0.65rem;
+            align-items: flex-start;
+            margin-bottom: 0.6rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 0.65rem 0.9rem;
+            background: #f8fafc;
+        }
+        .dark .exp-option {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .exp-opt-key {
+            flex-shrink: 0;
+            width: 1.6rem;
+            height: 1.6rem;
+            border-radius: 0.4rem;
+            background: #e0effe;
+            color: #0271c7;
+            font-weight: 900;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dark .exp-opt-key { background: #082949; color: #7cc7fb; }
+        .exp-opt-body { flex: 1; min-width: 0; font-size: 0.8rem; color: #475569; text-align: justify; }
+        .dark .exp-opt-body { color: #94a3b8; }
+        .exp-opt-body p { margin-bottom: 0.3rem; }
+
+        /* ── Verdict Badges ── */
+        .exp-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 0.15rem 0.55rem;
+            border-radius: 999px;
+            vertical-align: middle;
+            letter-spacing: 0.03em;
+        }
+        .exp-correct {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+        .exp-wrong {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+        .dark .exp-correct { background: #052e16; color: #4ade80; border-color: #166534; }
+        .dark .exp-wrong  { background: #450a0a; color: #f87171; border-color: #991b1b; }
+
+        /* ── Section heading ── */
+        .exp-section-heading {
+            margin: 0.9rem 0 0.45rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .exp-section-heading span {
+            font-size: 0.72rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #0271c7;
+            padding: 0.2rem 0.75rem;
+            border-radius: 999px;
+            background: #e0effe;
+        }
+        .dark .exp-section-heading span {
+            color: #7cc7fb;
+            background: #082949;
+        }
+
+        /* ── Bullet list ── */
+        .exp-bullets {
+            list-style: none;
+            padding: 0;
+            margin: 0.35rem 0 0.6rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .exp-bullets li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: #475569;
+            padding: 0.2rem 0;
+        }
+        .dark .exp-bullets li { color: #94a3b8; }
+        .exp-bullets li::before {
+            content: "▸";
+            color: #0c8fe9;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+            margin-top: 0.07rem;
+            font-weight: 900;
+        }
+
+        /* ── Key-Value Table ── */
+        .exp-table-wrap {
+            overflow-x: auto;
+            margin: 0.5rem 0 0.8rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+        }
+        .dark .exp-table-wrap { border-color: #334155; }
+        .exp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+        }
+        .exp-table th, .exp-table td {
+            padding: 0.45rem 0.85rem;
+            border-bottom: 1px solid #f1f5f9;
+            text-align: left;
+        }
+        .dark .exp-table th, .dark .exp-table td { border-color: #1e293b; }
+        .exp-table th {
+            font-weight: 700;
+            color: #0271c7;
+            white-space: nowrap;
+            background: #f0f7ff;
+            width: 35%;
+        }
+        .dark .exp-table th { background: #082949; color: #7cc7fb; }
+        .exp-table td { color: #334155; }
+        .dark .exp-table td { color: #cbd5e1; }
+        .exp-table tr:last-child th,
+        .exp-table tr:last-child td { border-bottom: none; }
+
+        /* ── IN NEWS banner ── */
+        .exp-news-banner {
+            margin-top: 1rem;
+            padding: 0.65rem 1rem;
+            border-radius: 0.75rem;
+            background: linear-gradient(90deg, #fff7ed, #fffbeb);
+            border: 1px solid #fed7aa;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+        }
+        .dark .exp-news-banner {
+            background: linear-gradient(90deg, #1c0a00, #1a1000);
+            border-color: #9a3412;
+        }
+        .exp-news-label {
+            flex-shrink: 0;
+            font-size: 0.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #c2410c;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            background: #fed7aa;
+            white-space: nowrap;
+        }
+        .dark .exp-news-label { background: #431407; color: #fb923c; }
+        .exp-news-text {
+            font-size: 0.78rem;
+            color: #9a3412;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+        .dark .exp-news-text { color: #fdba74; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-200">

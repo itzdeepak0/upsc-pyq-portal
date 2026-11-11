@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load explanation_tags %}
 
 {% block title %}Exam Results - {{ session.title }}{% endblock %}
 
@@ -250,8 +251,8 @@
                     <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">
                         Detailed Statement Analysis
                     </span>
-                    <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-xs text-slate-800 dark:text-slate-300 leading-relaxed whitespace-pre-line font-medium">
-                        {{ r.question.explanation }}
+                    <div class="exp-wrap bg-white dark:bg-slate-900/60 p-5 rounded-2xl border border-slate-100 dark:border-slate-800">
+                        {{ r.question.explanation|format_explanation|safe }}
                     </div>
 
                     {% if r.question.value_addition %}
